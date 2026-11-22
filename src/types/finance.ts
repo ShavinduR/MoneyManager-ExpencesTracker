@@ -213,12 +213,15 @@ export type MonthSummary = {
   totalOtherBills: Cents;
   /** fixed + debt payments + other bills (amount paid) */
   totalExpenses: Cents;
+  /** income − expenses (the planner's "Difference" row) */
+  incomeMinusExpenses: Cents;
   /** income − expenses − savings */
   netDifference: Cents;
   /** opening + netDifference */
   balanceForward: Cents;
   /** Σ max(0, amountDue − amountPaid) */
   outstandingBills: Cents;
+  unpaidBillCount: number;
   byCategory: Partial<Record<ExpenseCategory, Cents>>;
   biggestCategory: ExpenseCategory | null;
   smallestCategory: ExpenseCategory | null;

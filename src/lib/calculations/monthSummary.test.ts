@@ -37,6 +37,13 @@ describe('summarizeMonth', () => {
     expect(s.totalSavings).toBe(fromMajor(15000));
     expect(s.totalExpenses).toBe(fromMajor(20000 + 30000 + 1500.5 + 3000));
     expect(s.outstandingBills).toBe(fromMajor(2000));
+    expect(s.unpaidBillCount).toBe(1);
+    const settled = summarizeMonth(
+      { ...sample, otherBills: sample.otherBills.map((b) => ({ ...b, paid: true })) },
+      { amount: fromMajor(0), source: 'initial' },
+    );
+    expect(settled.outstandingBills).toBe(0);
+    expect(s.incomeMinusExpenses).toBe(fromMajor(100000 - 54500.5));
   });
 
   it('balance forward = opening + income − expenses − savings', () => {

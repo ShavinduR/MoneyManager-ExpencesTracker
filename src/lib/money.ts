@@ -36,6 +36,15 @@ export const parseMoney = (input: string): Cents | null => {
   return fromMajor(base * multiplier);
 };
 
+/** Like parseMoney but accepts a leading "-" or "−" (bank balances, credit cards). */
+export const parseSignedMoney = (input: string): Cents | null => {
+  const trimmed = input.trim();
+  const negative = /^[-−]/.test(trimmed);
+  const value = parseMoney(negative ? trimmed.slice(1) : trimmed);
+  if (value === null) return null;
+  return negative ? cents(-value) : value;
+};
+
 const unitMultiplier = (unit: string | undefined): number => {
   switch (unit) {
     case 'k':

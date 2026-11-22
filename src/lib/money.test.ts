@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cents, formatMoney, fromMajor, parseMoney, sumCents } from './money';
+import { cents, formatMoney, fromMajor, parseMoney, parseSignedMoney, sumCents } from './money';
 
 describe('money', () => {
   it('avoids floating point drift by summing integer cents', () => {
@@ -24,5 +24,12 @@ describe('money', () => {
     expect(formatMoney(cents(150050), 'LKR')).toBe('Rs. 1,500.50');
     expect(formatMoney(fromMajor(-250), 'LKR')).toBe('−Rs. 250');
     expect(formatMoney(fromMajor(10), 'USD', { signed: true, decimals: 'always' })).toBe('+$10.00');
+  });
+
+  it('parseSignedMoney accepts negatives', () => {
+    expect(parseSignedMoney('-65,000')).toBe(fromMajor(-65000));
+    expect(parseSignedMoney('−1.5k')).toBe(fromMajor(-1500));
+    expect(parseSignedMoney('250')).toBe(fromMajor(250));
+    expect(parseSignedMoney('-')).toBe(null);
   });
 });

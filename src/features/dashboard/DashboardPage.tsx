@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Database, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarDays, Database, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
+import { upcomingBills } from '@/lib/calculations/upcomingBills';
+import { todayISO } from '@/lib/dates';
+import { DueBadge } from '@/features/monthly/DueBadge';
+import { subCents } from '@/lib/money';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useMonthView } from '@/hooks/useMonthView';
 import { currentMonthKey, formatDateShort, formatMonthLong, MONTH_LABELS_LONG, parseMonthKey } from '@/lib/dates';
@@ -65,6 +69,7 @@ const Welcome = () => {
 
 export const DashboardPage = () => {
   const hasData = useFinanceStore((s) => s.hasData);
+  const months = useFinanceStore((s) => s.data.months);
   const name = useFinanceStore((s) => s.data.profile.name);
   const month = currentMonthKey();
   const { record, summary } = useMonthView(month);
@@ -79,6 +84,7 @@ export const DashboardPage = () => {
   const goals = record.goals.filter((g) => g.text.trim());
   const goalsDone = goals.filter((g) => g.done).length;
   const { month: monthNumber } = parseMonthKey(month);
+  const dueBills = upcomingBills(months, todayISO());
 
   return (
     <div className="animate-fade-up space-y-4">
@@ -127,6 +133,24 @@ export const DashboardPage = () => {
         </Card>
 
         <div className="space-y-4 lg:col-span-2">
+          {dueBills.length > 0 && (
+            <Card>
+              <CardHeader title="Bills needing attention" subtitle="Overdue or due within 7 days" icon={<BellRing className="size-4" />} />
+              <ul className="divide-y divide-zinc-100 py-1 dark:divide-ink-800">
+                {dueBills.slice(0, 4).map((b) => (
+                  <li key={b.id}>
+                    <Link to={`/monthly/${b.month}`} className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-zinc-50 sm:px-5 dark:hover:bg-ink-850">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{b.name}</p>
+                        <div className="mt-0.5"><DueBadge dueDate={b.dueDate} paid={b.paid} /></div>
+                      </div>
+                      <Money value={subCents(b.amountDue, b.amountPaid)} className="text-sm font-medium" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
           <Card>
             <CardHeader title="Monthly goals" subtitle={goals.length ? `${goalsDone} of ${goals.length} done` : 'Set up to 5 goals'} icon={<Flag className="size-4" />} />
             <div className="p-4 sm:p-5">

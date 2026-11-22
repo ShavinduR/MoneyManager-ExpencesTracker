@@ -120,6 +120,12 @@ const buildMonth = (month: MonthKey, index: number, rng: Rng, today: ISODate): M
       : [{ id: id(), name: 'Udemy course', dueDate: d(9), amountDue: fromMajor(3900), amountPaid: fromMajor(isPast(d(9)) ? 3900 : 0), paid: isPast(d(9)), category: 'education' as const, notes: 'React advanced patterns' }]),
     { id: id(), name: 'Birthday gift', dueDate: d(17), amountDue: fromMajor(6000), amountPaid: fromMajor(isPast(d(17)) ? 5200 : 0), paid: isPast(d(17)), category: 'gifts-donations', notes: 'Came in under budget' },
   ];
+  // The current month gets one overdue and one upcoming bill so due-date badges and reminders are visible.
+  const isCurrent = month === currentMonthKey();
+  bills.push(
+    { id: id(), name: 'Revenue licence renewal', dueDate: d(20), amountDue: fromMajor(3200), amountPaid: fromMajor(isCurrent ? 0 : 3200), paid: !isCurrent, category: 'transport', notes: isCurrent ? 'Divisional secretariat — bring emission cert' : '' },
+    { id: id(), name: 'Home Wi-Fi router upgrade', dueDate: d(28), amountDue: fromMajor(12500), amountPaid: fromMajor(isPast(d(28)) ? 12500 : 0), paid: isPast(d(28)), category: 'phone-internet', notes: '' },
+  );
   // Mark the pharmacy bill paid in past months
   const pharmacy = bills[1];
   if (pharmacy && isPast(pharmacy.dueDate)) {

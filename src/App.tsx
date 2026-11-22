@@ -8,6 +8,7 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { MonthlyPage, MonthlyRedirect } from '@/features/monthly/MonthlyPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MorePage } from '@/features/settings/MorePage';
+import { BankAccountsPage } from '@/features/accounts/BankAccountsPage';
 import { ComingSoon } from '@/features/placeholder/ComingSoon';
 
 export const App = () => {
@@ -40,7 +41,7 @@ export const App = () => {
           <Route path="debts" element={<ComingSoon title="Debt tracker" phase={3} description="Multiple debt accounts, payment history and a payoff simulator." />} />
           <Route path="goals" element={<ComingSoon title="Yearly goals" phase={3} description="8 yearly goal cards with progress and your “This year, I will…” commitment." />} />
           <Route path="summary" element={<ComingSoon title="Summary of the year" phase={3} description="12-month matrix, category breakdown and charts." />} />
-          <Route path="accounts" element={<ComingSoon title="Bank accounts" phase={2} description="Security-first account overview: no passwords or hints, ever." />} />
+          <Route path="accounts" element={<BankAccountsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="more" element={<MorePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -24,8 +24,12 @@ export const summarizeMonth = (record: MonthRecord, opening: OpeningBalance): Mo
   const totalDebtPayments = sumCents(amountsOf('debt'));
   const totalOtherBills = sumCents(record.otherBills.map((b) => b.amountPaid));
   const totalExpenses = sumCents([totalFixed, totalDebtPayments, totalOtherBills]);
-  const netDifference = subCents(subCents(totalIncome, totalExpenses), totalSavings);
-  const outstandingBills = sumCents(record.otherBills.map((b) => maxCents(ZERO, subCents(b.amountDue, b.amountPaid))));
+  const incomeMinusExpenses = subCents(totalIncome, totalExpenses);
+  const netDifference = subCents(incomeMinusExpenses, totalSavings);
+  // A bill marked paid is settled even if it came in under the amount due.
+  const outstandingBills = sumCents(
+    record.otherBills.filter((b) => !b.paid).map((b) => maxCents(ZERO, subCents(b.amountDue, b.amountPaid))),
+  );
 
   const byCategory = expenseByCategory(record);
   const { biggest, smallest } = rankCategories(byCategory);
@@ -42,9 +46,11 @@ export const summarizeMonth = (record: MonthRecord, opening: OpeningBalance): Mo
     totalDebtPayments,
     totalOtherBills,
     totalExpenses,
+    incomeMinusExpenses,
     netDifference,
     balanceForward: addCents(opening.amount, netDifference),
     outstandingBills,
+    unpaidBillCount: record.otherBills.filter((b) => !b.paid).length,
     byCategory,
     biggestCategory: biggest,
     smallestCategory: smallest,
