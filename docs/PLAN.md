@@ -1,6 +1,6 @@
 # Phase 0: Architecture & Data Model Proposal
 
-Status: **awaiting approval**. Nothing in `src/` exists yet.
+Status: **approved** (all four defaults in section 8 accepted). Phase 1 complete.
 
 The product: a local-first PWA that turns a paper 4-year finance planner into an app. One month is the unit of work: you open a month, log money in and out, and the app does the arithmetic, carries the balance into next month, and rolls everything up into yearly analytics.
 

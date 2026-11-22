@@ -1,0 +1,28 @@
+import { describe, expect, it } from 'vitest';
+import { cents, formatMoney, fromMajor, parseMoney, sumCents } from './money';
+
+describe('money', () => {
+  it('avoids floating point drift by summing integer cents', () => {
+    expect(sumCents([fromMajor(0.1), fromMajor(0.2)])).toBe(30);
+  });
+
+  it.each([
+    ['1,500', 150000],
+    ['Rs. 1500.50', 150050],
+    ['85000/=', 8500000],
+    ['1.5k', 150000],
+    ['2 lakh', 20000000],
+    ['', null],
+    ['abc', null],
+    ['-50', null],
+  ])('parseMoney(%s) → %s', (input, expected) => {
+    expect(parseMoney(input)).toBe(expected);
+  });
+
+  it('formats LKR with Rs. prefix and hides .00 on whole amounts', () => {
+    expect(formatMoney(fromMajor(85000), 'LKR')).toBe('Rs. 85,000');
+    expect(formatMoney(cents(150050), 'LKR')).toBe('Rs. 1,500.50');
+    expect(formatMoney(fromMajor(-250), 'LKR')).toBe('−Rs. 250');
+    expect(formatMoney(fromMajor(10), 'USD', { signed: true, decimals: 'always' })).toBe('+$10.00');
+  });
+});

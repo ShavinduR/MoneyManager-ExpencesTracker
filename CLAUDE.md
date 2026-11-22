@@ -10,7 +10,7 @@ npm run dev          # Vite dev server
 npm run build        # tsc -b && vite build (must pass with zero errors before every commit)
 npm run preview      # serve the production build (test PWA/offline here, not in dev)
 npm run test         # vitest run (pure logic in src/lib)
-npm run lint         # eslint
+npm run typecheck    # tsc only
 ```
 
 ## Architecture rules
