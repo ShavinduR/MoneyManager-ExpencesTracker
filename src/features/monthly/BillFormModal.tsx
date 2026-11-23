@@ -53,8 +53,8 @@ export const BillFormModal = ({ open, onClose, month, bill, onSave }: BillFormMo
     const amountDue = parseMoney(form.amountDue);
     const amountPaid = form.amountPaid.trim() ? parseMoney(form.amountPaid) : ZERO;
     if (!form.name.trim()) return setError('Give the bill a name.');
-    if (amountDue === null) return setError('Enter the amount due, e.g. 4200.');
-    if (amountPaid === null) return setError('Amount paid must be a number.');
+    if (amountDue === null) return setError('Enter the amount due (up to 1 trillion), e.g. 4200.');
+    if (amountPaid === null) return setError('Amount paid must be a number up to 1 trillion.');
     if (!isISODate(form.dueDate)) return setError('Pick a valid due date.');
     if (!isExpenseCategory(form.category)) return setError('Choose a category.');
     onSave({
@@ -111,7 +111,7 @@ export const BillFormModal = ({ open, onClose, month, bill, onSave }: BillFormMo
         <label className="col-span-2 flex cursor-pointer items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 text-sm dark:bg-ink-850">
           <CheckCircle checked={form.paid} onChange={togglePaid} label="Paid" />
           <span>Paid</span>
-          <span className="ml-auto text-xs text-zinc-500">Only the amount paid counts toward expenses</span>
+          <span className="ml-auto text-xs text-muted">Only the amount paid counts toward expenses</span>
         </label>
         {error && <p className="col-span-2 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
         <button type="submit" className="hidden" aria-hidden tabIndex={-1} />

@@ -9,19 +9,19 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      // 'prompt' (L11): a new version waits until the user chooses to reload, so nothing mid-edit is lost.
+      registerType: 'prompt',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'theme-init.js'],
       manifest: {
         id: '/',
         name: 'Mindset Finance Planner',
         short_name: 'Mindset',
         description: 'Local-first personal finance & mindset planner. Track months, debts, goals and reflections — offline.',
         theme_color: '#0b0f14',
-        background_color: '#0b0f14',
+        background_color: '#fafafa',
         display: 'standalone',
         start_url: '/',
         scope: '/',
-        orientation: 'portrait-primary',
         categories: ['finance', 'productivity', 'lifestyle'],
         shortcuts: [
           { name: 'This month', short_name: 'Monthly', url: '/monthly', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
@@ -36,6 +36,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globIgnores: ['og-image.png'],
         navigateFallback: '/index.html',
         // Lazy route chunks (Debts, Year Summary, Recharts) are precached too, so they open offline.
         cleanupOutdatedCaches: true,

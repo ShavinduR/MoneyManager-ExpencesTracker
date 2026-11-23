@@ -31,4 +31,18 @@ describe('debt history', () => {
     expect(p.remaining).toBe(0);
     expect(p.progress).toBe(1);
   });
+
+  it('M1: planned (uncleared) payments are listed but do not reduce the balance', () => {
+    const planned = {
+      '2026-12': { ...emptyMonth('2026-12'), entries: [{ ...pay('p', '2026-12-25', 40000), cleared: false }] },
+    };
+    const rows = debtPaymentHistory(debt, planned);
+    expect(rows[0]?.cleared).toBe(false);
+    const p = debtProgress(debt, rows);
+    expect(p.remaining).toBe(fromMajor(50000));
+    expect(p.totalPaid).toBe(0);
+    expect(p.plannedTotal).toBe(fromMajor(40000));
+    expect(p.plannedCount).toBe(1);
+    expect(p.paymentCount).toBe(0);
+  });
 });

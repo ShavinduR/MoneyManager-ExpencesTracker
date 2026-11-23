@@ -68,7 +68,7 @@ export const OtherBillsSection = ({ month, bills }: { month: MonthKey; bills: Ot
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-y border-zinc-100 text-left text-[11px] font-medium uppercase tracking-wider text-zinc-400 dark:border-ink-800">
+                  <tr className="border-y border-zinc-100 text-left text-[11px] font-medium uppercase tracking-wider text-subtle dark:border-ink-800">
                     <th className="w-14 py-2 pl-5 font-medium">Paid</th>
                     <th className="py-2 pr-3 font-medium">Bill</th>
                     <th className="whitespace-nowrap py-2 pr-3 font-medium">Due date</th>
@@ -85,19 +85,19 @@ export const OtherBillsSection = ({ month, bills }: { month: MonthKey; bills: Ot
                         <CheckCircle checked={bill.paid} onChange={() => toggle(bill)} label={`Mark ${bill.name} ${bill.paid ? 'unpaid' : 'paid'}`} />
                       </td>
                       <td className="max-w-56 py-2.5 pr-3">
-                        <p className={cn('truncate font-medium', bill.paid && 'text-zinc-500 dark:text-zinc-400')}>{bill.name}</p>
-                        <p className="truncate text-xs text-zinc-500">{EXPENSE_LABELS[bill.category]}</p>
+                        <p className={cn('truncate font-medium', bill.paid && 'text-muted dark:text-zinc-400')}>{bill.name}</p>
+                        <p className="truncate text-xs text-muted">{EXPENSE_LABELS[bill.category]}</p>
                       </td>
                       <td className="whitespace-nowrap py-2.5 pr-3">
-                        <span className="mr-2 text-xs text-zinc-500 tabular">{formatDateShort(bill.dueDate)}</span>
+                        <span className="mr-2 text-xs text-muted tabular">{formatDateShort(bill.dueDate)}</span>
                         <DueBadge dueDate={bill.dueDate} paid={bill.paid} />
                       </td>
                       <td className="py-2.5 pr-3 text-right"><Money value={bill.amountDue} /></td>
                       <td className="py-2.5 pr-3 text-right font-medium">
                         <Money value={bill.amountPaid} tone={bill.amountPaid === 0 ? 'muted' : 'none'} />
-                        {!bill.paid && bill.amountPaid > 0 && bill.amountPaid < bill.amountDue && <p className="text-[10px] font-normal text-amber-600 dark:text-amber-400">Partial</p>}
+                        {!bill.paid && bill.amountPaid > 0 && bill.amountPaid < bill.amountDue && <p className="text-[10px] font-normal text-amber-700 dark:text-amber-400">Partial</p>}
                       </td>
-                      <td className="hidden max-w-48 truncate py-2.5 pr-3 text-xs text-zinc-500 lg:table-cell">{bill.notes || '—'}</td>
+                      <td className="hidden max-w-48 truncate py-2.5 pr-3 text-xs text-muted lg:table-cell">{bill.notes || '—'}</td>
                       <td className="py-2.5 pr-3">
                         <div className="flex justify-end opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100">
                           <IconButton label={`Edit ${bill.name}`} onClick={() => openEdit(bill)} className="size-8"><Pencil className="size-3.5" /></IconButton>
@@ -115,15 +115,15 @@ export const OtherBillsSection = ({ month, bills }: { month: MonthKey; bills: Ot
                 <li key={bill.id} className="flex items-start gap-3 px-4 py-3">
                   <CheckCircle checked={bill.paid} onChange={() => toggle(bill)} label={`Mark ${bill.name} ${bill.paid ? 'unpaid' : 'paid'}`} className="mt-0.5" />
                   <button type="button" onClick={() => openEdit(bill)} className="min-w-0 flex-1 text-left">
-                    <p className={cn('truncate text-sm font-medium', bill.paid && 'text-zinc-500 dark:text-zinc-400')}>{bill.name}</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
+                    <p className={cn('truncate text-sm font-medium', bill.paid && 'text-muted dark:text-zinc-400')}>{bill.name}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
                       <span className="tabular">{formatDateShort(bill.dueDate)}</span>
                       <DueBadge dueDate={bill.dueDate} paid={bill.paid} />
                     </div>
                   </button>
                   <div className="text-right text-sm">
                     <Money value={bill.amountDue} className="font-medium" />
-                    <p className="text-[11px] text-zinc-500">paid <Money value={bill.amountPaid} /></p>
+                    <p className="text-[11px] text-muted">paid <Money value={bill.amountPaid} /></p>
                   </div>
                 </li>
               ))}
@@ -134,15 +134,15 @@ export const OtherBillsSection = ({ month, bills }: { month: MonthKey; bills: Ot
 
       <div className="grid grid-cols-3 gap-2 rounded-b-[var(--radius-card)] border-t border-zinc-100 bg-zinc-50/60 px-4 py-3 text-right sm:px-5 dark:border-ink-800 dark:bg-ink-850/40">
         <div className="text-left">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Total due</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Total due</p>
           <Money value={totalDue} className="text-sm font-semibold" />
         </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Total paid</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Total paid</p>
           <Money value={totalPaid} className="text-sm font-semibold" />
         </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Outstanding</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Outstanding</p>
           <Money value={outstanding} tone={outstanding > 0 ? 'negative' : 'muted'} className="text-sm font-semibold" />
         </div>
       </div>

@@ -3,7 +3,7 @@ import { CornerDownLeft, Loader2, Sparkles, Wand2, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { parseQuickEntry, type ParseResult, type QuickEntryDraft } from '@/lib/quickEntry/parser';
 import { parseWithGemini, resolveGeminiKey } from '@/lib/quickEntry/llmParser';
-import { getGeminiKey } from '@/lib/localPrefs';
+import { getGeminiKey, getGeminiModel } from '@/lib/localPrefs';
 import { formatMonthLong, monthKeyOf } from '@/lib/dates';
 import { removeEntry } from '@/lib/monthOps';
 import { useFinanceStore } from '@/store/useFinanceStore';
@@ -46,7 +46,9 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
     const onKey = (event: KeyboardEvent): void => {
       const target = event.target;
       const typing = target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
-      if ((event.key === '/' && !typing) || (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey))) {
+      // Never steal keys while the user is typing: Ctrl+K deletes to end of line in macOS text fields (M4).
+      if (typing) return;
+      if (event.key === '/' || (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey))) {
         event.preventDefault();
         inputRef.current?.focus();
       }
@@ -80,7 +82,7 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
     if (!apiKey || !text.trim()) return;
     setAiLoading(true);
     setOverride(null);
-    const r = await parseWithGemini(text, { apiKey, debts });
+    const r = await parseWithGemini(text, { apiKey, model: getGeminiModel(), debts });
     setAiLoading(false);
     if (r.ok) setAiResult(r);
     else toast.error(r.reason);
@@ -116,17 +118,17 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
             }}
             placeholder={`Quick add — try “${EXAMPLES[exampleIndex] ?? ''}”`}
             aria-label="Quick add: describe a transaction, e.g. Petrol 1500 today"
-            className="h-full min-w-0 flex-1 bg-transparent text-sm placeholder:text-zinc-400 focus:outline-none"
+            className="h-full min-w-0 flex-1 bg-transparent text-sm placeholder:text-subtle focus:outline-none"
             autoComplete="off"
             enterKeyHint="done"
           />
           {text && (
-            <button type="button" onClick={reset} className="rounded-lg p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label="Clear">
+            <button type="button" onClick={reset} className="rounded-lg p-1.5 text-subtle hover:text-zinc-700 dark:hover:text-zinc-200" aria-label="Clear">
               <X className="size-4" />
             </button>
           )}
           {!text && (
-            <kbd className="mr-1 hidden rounded-md border border-zinc-200 px-1.5 py-0.5 font-sans text-[10px] text-zinc-400 lg:block dark:border-ink-700">/</kbd>
+            <kbd className="mr-1 hidden rounded-md border border-zinc-200 px-1.5 py-0.5 font-sans text-[10px] text-subtle lg:block dark:border-ink-700">/</kbd>
           )}
           {apiKey && text && (
             <button
@@ -156,7 +158,7 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
           {draft ? (
             <ConfirmationPill draft={draft} onChange={setOverride} onConfirm={() => save(draft)} />
           ) : (
-            <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-xs text-zinc-500 shadow-lg animate-pop-in dark:border-ink-700 dark:bg-ink-850">
+            <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-xs text-muted shadow-lg animate-pop-in dark:border-ink-700 dark:bg-ink-850">
               {result && !result.ok ? result.reason : 'Keep typing…'}
               {apiKey && <span className="ml-1">Or tap <b className="text-violet-600 dark:text-violet-400">AI</b> to parse it.</span>}
             </div>

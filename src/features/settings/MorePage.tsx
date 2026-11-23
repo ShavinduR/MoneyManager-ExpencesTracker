@@ -14,7 +14,7 @@ export const MorePage = () => (
             <Icon className="size-4" />
           </span>
           <span className="flex-1">{label}</span>
-          <ChevronRight className="size-4 text-zinc-400" />
+          <ChevronRight className="size-4 text-subtle" />
         </Link>
       ))}
     </Card>

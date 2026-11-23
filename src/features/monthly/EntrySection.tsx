@@ -92,7 +92,7 @@ export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, en
             {/* Desktop table */}
             <table className="hidden w-full text-sm sm:table">
               <thead>
-                <tr className="border-y border-zinc-100 text-left text-[11px] font-medium uppercase tracking-wider text-zinc-400 dark:border-ink-800">
+                <tr className="border-y border-zinc-100 text-left text-[11px] font-medium uppercase tracking-wider text-subtle dark:border-ink-800">
                   <th className="w-14 py-2 pl-5 font-medium"><span className="sr-only">Status</span></th>
                   <th className="w-20 whitespace-nowrap py-2 pr-3 font-medium">Date</th>
                   <th className="py-2 font-medium">{kind === 'income' || kind === 'savings' ? 'Source' : 'Description'}</th>
@@ -106,10 +106,10 @@ export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, en
                     <td className="py-2.5 pl-5">
                       <CheckCircle checked={entry.cleared} onChange={() => toggle(entry)} label={`Mark ${entry.description} ${entry.cleared ? 'not cleared' : 'cleared'}`} />
                     </td>
-                    <td className="whitespace-nowrap py-2.5 pr-3 text-xs text-zinc-500 tabular">{formatDateShort(entry.date)}</td>
+                    <td className="whitespace-nowrap py-2.5 pr-3 text-xs text-muted tabular">{formatDateShort(entry.date)}</td>
                     <td className="w-full max-w-0 py-2.5 pr-3">
-                      <p className={cn('truncate font-medium', entry.cleared && kind !== 'income' && 'text-zinc-500 dark:text-zinc-400')}>{entry.description}</p>
-                      <p className="flex items-center gap-1.5 truncate text-xs text-zinc-500">
+                      <p className={cn('truncate font-medium', entry.cleared && kind !== 'income' && 'text-muted dark:text-zinc-400')}>{entry.description}</p>
+                      <p className="flex items-center gap-1.5 truncate text-xs text-muted">
                         {entry.kind === 'debt' && entry.debtId ? (
                           <Link2 className="size-3 shrink-0 text-violet-500" />
                         ) : (
@@ -142,8 +142,8 @@ export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, en
                 <li key={entry.id} className="flex items-center gap-3 px-4 py-3">
                   <CheckCircle checked={entry.cleared} onChange={() => toggle(entry)} label={`Mark ${entry.description} ${entry.cleared ? 'not cleared' : 'cleared'}`} />
                   <button type="button" onClick={() => openEdit(entry)} className="min-w-0 flex-1 text-left">
-                    <p className={cn('truncate text-sm font-medium', entry.cleared && kind !== 'income' && 'text-zinc-500 dark:text-zinc-400')}>{entry.description}</p>
-                    <p className="truncate text-xs text-zinc-500">
+                    <p className={cn('truncate text-sm font-medium', entry.cleared && kind !== 'income' && 'text-muted dark:text-zinc-400')}>{entry.description}</p>
+                    <p className="truncate text-xs text-muted">
                       {formatDateShort(entry.date)} · {secondary(entry)}
                     </p>
                   </button>
@@ -156,7 +156,7 @@ export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, en
       </div>
 
       <div className="flex items-center justify-between rounded-b-[var(--radius-card)] border-t border-zinc-100 bg-zinc-50/60 px-4 py-3 sm:px-5 dark:border-ink-800 dark:bg-ink-850/40">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted">Total</span>
         <Money value={total} className="text-sm font-semibold" />
       </div>
 

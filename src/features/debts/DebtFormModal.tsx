@@ -52,8 +52,8 @@ export const DebtFormModal = ({ open, onClose, debt, onSave }: Props) => {
     const minimumPayment = parseMoney(form.minimumPayment || '0');
     if (!form.creditor.trim()) return setError('Who do you owe? Add the creditor.');
     if (!Number.isFinite(apr) || apr < 0 || apr > 100) return setError('Interest rate must be between 0 and 100%. Use 0 for interest-free.');
-    if (startingBalance === null || startingBalance <= 0) return setError('Enter the starting balance.');
-    if (minimumPayment === null) return setError('Minimum payment must be a number.');
+    if (startingBalance === null || startingBalance <= 0) return setError('Enter the starting balance (up to 1 trillion).');
+    if (minimumPayment === null) return setError('Minimum payment must be a number up to 1 trillion.');
     if (!isISODate(form.startDate)) return setError('Pick a valid start date.');
     if (form.goalPayoffDate && !isISODate(form.goalPayoffDate)) return setError('Pick a valid goal date.');
     onSave({

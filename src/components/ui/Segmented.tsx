@@ -21,7 +21,7 @@ export const Segmented = <T extends string>({ value, onChange, options, label, c
           'rounded-lg px-3 py-1.5 text-xs font-medium transition-[background-color,color,box-shadow] duration-150',
           option.value === value
             ? 'bg-white text-zinc-900 shadow-sm dark:bg-ink-700 dark:text-zinc-50'
-            : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200',
+            : 'text-muted hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200',
         )}
       >
         {option.label}

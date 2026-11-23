@@ -11,7 +11,7 @@ type RowProps = { label: string; value: Cents; operator?: '+' | '−' | '='; emp
 const Row = ({ label, value, operator, emphasis, signed }: RowProps) => (
   <div className={cn('flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5', emphasis && 'bg-zinc-900 text-white dark:bg-ink-800')}>
     <span className={cn('flex items-center gap-2 text-sm', emphasis ? 'font-semibold' : 'text-zinc-600 dark:text-zinc-400')}>
-      <span className={cn('w-3 text-center font-mono text-xs', emphasis ? 'text-accent-400' : 'text-zinc-400')} aria-hidden>
+      <span className={cn('w-3 text-center font-mono text-xs', emphasis ? 'text-accent-400' : 'text-subtle')} aria-hidden>
         {operator ?? ''}
       </span>
       {label}
@@ -27,7 +27,7 @@ const Row = ({ label, value, operator, emphasis, signed }: RowProps) => (
 
 const SpendingArea = ({ title, icon, category, amount, share }: { title: string; icon: React.ReactNode; category: MonthSummary['biggestCategory']; amount: Cents | null; share: number | null }) => (
   <div className="flex-1 px-4 py-4 sm:px-5">
-    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
       {icon}
       {title}
     </p>
@@ -38,12 +38,12 @@ const SpendingArea = ({ title, icon, category, amount, share }: { title: string;
             <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[category] }} />
             {EXPENSE_LABELS[category]}
           </p>
-          {share !== null && <p className="mt-0.5 text-xs text-zinc-500 tabular">{Math.round(share * 100)}% of expenses</p>}
+          {share !== null && <p className="mt-0.5 text-xs text-muted tabular">{Math.round(share * 100)}% of expenses</p>}
         </div>
         <Money value={amount} className="text-sm font-medium" />
       </div>
     ) : (
-      <p className="mt-2 text-sm text-zinc-400">Add expenses to see this</p>
+      <p className="mt-2 text-sm text-subtle">Add expenses to see this</p>
     )}
   </div>
 );
@@ -60,7 +60,7 @@ export const OverviewCard = ({ summary }: { summary: MonthSummary }) => {
       <div className="flex items-center gap-2 px-4 pt-4 sm:px-5 sm:pt-5">
         <ChevronsRight className="size-4 text-accent-500" />
         <h2 className="text-[15px] font-semibold tracking-tight">This month’s financial overview</h2>
-        <span className="ml-auto text-[11px] text-zinc-500">Calculated automatically</span>
+        <span className="ml-auto text-[11px] text-muted">Calculated automatically</span>
       </div>
 
       <div className="mt-4 grid border-t border-zinc-100 md:grid-cols-2 dark:border-ink-800">
@@ -86,14 +86,14 @@ export const OverviewCard = ({ summary }: { summary: MonthSummary }) => {
             )}
             <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
               <div>
-                <p className="text-zinc-500">Savings rate</p>
+                <p className="text-muted">Savings rate</p>
                 <p className="mt-0.5 text-sm font-semibold tabular">{rate === null ? '—' : `${Math.round(rate * 100)}%`}</p>
               </div>
               <div>
-                <p className="flex items-center gap-1 text-zinc-500"><Receipt className="size-3" /> Outstanding bills</p>
+                <p className="flex items-center gap-1 text-muted"><Receipt className="size-3" /> Outstanding bills</p>
                 <p className="mt-0.5 text-sm font-semibold">
                   <Money value={summary.outstandingBills} tone={summary.outstandingBills > 0 ? 'negative' : 'muted'} />
-                  {summary.unpaidBillCount > 0 && <span className="ml-1 text-xs font-normal text-zinc-500">({summary.unpaidBillCount} unpaid)</span>}
+                  {summary.unpaidBillCount > 0 && <span className="ml-1 text-xs font-normal text-muted">({summary.unpaidBillCount} unpaid)</span>}
                 </p>
               </div>
             </div>

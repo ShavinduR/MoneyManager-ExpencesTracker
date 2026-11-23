@@ -29,7 +29,7 @@ export const CardHeader = ({ title, subtitle, icon, action, className }: CardHea
       )}
       <div className="min-w-0">
         <h2 className="truncate text-[15px] font-semibold tracking-tight">{title}</h2>
-        {subtitle && <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</p>}
+        {subtitle && <p className="truncate text-xs text-muted dark:text-zinc-400">{subtitle}</p>}
       </div>
     </div>
     {action}

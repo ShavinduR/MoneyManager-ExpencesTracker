@@ -56,8 +56,8 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       className={cn(
         'inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-[background-color,color,transform] duration-150 active:scale-[0.94]',
         tone === 'danger'
-          ? 'text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'
-          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-ink-800 dark:hover:text-zinc-100',
+          ? 'text-subtle hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'
+          : 'text-muted hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-ink-800 dark:hover:text-zinc-100',
         className,
       )}
       {...rest}

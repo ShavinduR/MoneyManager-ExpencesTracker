@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fromMajor } from '@/lib/money';
+import { cents, fromMajor } from '@/lib/money';
 import { comparePayoff, requiredMonthlyPayment, simulatePayoff } from './payoffSimulator';
 
 const base = { startMonth: '2026-11' };
@@ -84,5 +84,18 @@ describe('requiredMonthlyPayment', () => {
 
   it('returns null for non-positive horizons', () => {
     expect(requiredMonthlyPayment(fromMajor(1000), 10, 0)).toBeNull();
+  });
+});
+
+describe('L5: invalid inputs are rejected, not simulated', () => {
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, -5, 101])('apr %s', (apr) => {
+    const r = simulatePayoff({ balance: fromMajor(1000), aprPercent: apr, monthlyPayment: fromMajor(100), startMonth: '2026-11' });
+    expect(r).toMatchObject({ kind: 'never', reason: 'invalid-input' });
+  });
+
+  it('unsafe balances are rejected', () => {
+    const r = simulatePayoff({ balance: cents(1e19), aprPercent: 10, monthlyPayment: fromMajor(100), startMonth: '2026-11' });
+    expect(r).toMatchObject({ kind: 'never', reason: 'invalid-input' });
+    expect(requiredMonthlyPayment(fromMajor(1000), Number.NaN, 12)).toBeNull();
   });
 });

@@ -21,7 +21,7 @@ export const ChartTooltip = ({ active, payload, label, currency, labelFormatter 
       <ul className="space-y-1">
         {payload.map((item) => (
           <li key={String(item.dataKey ?? item.name)} className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+            <span className="flex items-center gap-1.5 text-muted dark:text-zinc-400">
               <span className="size-2 rounded-full" style={{ backgroundColor: item.color ?? item.fill }} />
               {String(item.name ?? '')}
             </span>

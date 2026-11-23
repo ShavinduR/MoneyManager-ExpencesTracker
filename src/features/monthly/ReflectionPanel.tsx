@@ -14,7 +14,7 @@ const PROMPTS = [
 ];
 
 const SaveIndicator = ({ state }: { state: SaveState }) => (
-  <span className={cn('flex items-center gap-1 text-[11px] transition-opacity duration-200', state === 'idle' ? 'opacity-0' : 'opacity-100', state === 'saved' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400')} aria-live="polite">
+  <span className={cn('flex items-center gap-1 text-[11px] transition-opacity duration-200', state === 'idle' ? 'opacity-0' : 'opacity-100', state === 'saved' ? 'text-emerald-700 dark:text-emerald-400' : 'text-subtle')} aria-live="polite">
     {state === 'saved' && <Check className="size-3" />}
     {state === 'dirty' ? 'Saving…' : state === 'saved' ? 'Saved' : ''}
   </span>

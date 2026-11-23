@@ -30,7 +30,7 @@ const Cell = ({ value, compact }: { value: Cents | null; compact: boolean }) => 
   return (
     <td className="whitespace-nowrap px-2.5 py-2.5 text-right text-[13px] tabular">
       {value === null ? (
-        <span className="text-zinc-300 dark:text-zinc-600">—</span>
+        <span className="text-subtle">—</span>
       ) : compact ? (
         <span title={format(value)}>{formatAxis(value)}</span>
       ) : (
@@ -52,7 +52,7 @@ const Matrix = ({ head, children }: { head: string[]; children: ReactNode }) => 
   <div ref={ref} className="overflow-x-auto">
     <table className="w-full min-w-max text-sm">
       <thead>
-        <tr className="border-y border-zinc-100 text-[11px] uppercase tracking-wider text-zinc-400 dark:border-ink-800">
+        <tr className="border-y border-zinc-100 text-[11px] uppercase tracking-wider text-subtle dark:border-ink-800">
           {head.map((h, i) => (
             <th key={h} className={cn('px-3 py-2 font-medium', i === 0 ? 'sticky left-0 z-10 bg-white pl-4 text-left sm:pl-5 dark:bg-ink-900' : 'text-right', i === head.length - 1 && 'bg-zinc-50 dark:bg-ink-850')}>
               {h}
@@ -112,16 +112,16 @@ export const YearSummaryPage = () => {
             icon={<BarChart3 className="size-4" />}
             title={`No months recorded for ${RANGES.find((r) => r.value === range)?.label.toLowerCase()} ${year}`}
             description="Add income and expenses on the Monthly page and this summary fills itself in."
-            action={<Link to={`/monthly/${today}`} className="text-sm font-medium text-accent-600 hover:underline dark:text-accent-400">Open this month →</Link>}
+            action={<Link to={`/monthly/${today}`} className="text-sm font-medium text-accent-700 hover:underline dark:text-accent-400">Open this month →</Link>}
           />
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&>*]:min-w-0">
             {kpis.map((k) => (
               <Card key={k.label} className="p-4">
-                <p className="text-xs font-medium text-zinc-500">{k.label}</p>
-                {k.value !== null && <Money value={k.value} tone={k.tone ?? 'none'} signed={k.tone === 'auto'} className="mt-1 block text-lg font-semibold tracking-tight sm:text-xl" />}
+                <p className="text-xs font-medium text-muted">{k.label}</p>
+                {k.value !== null && <Money value={k.value} tone={k.tone ?? 'none'} signed={k.tone === 'auto'} fit="xl" className="mt-1 block font-semibold tracking-tight" />}
               </Card>
             ))}
           </div>
@@ -143,7 +143,7 @@ export const YearSummaryPage = () => {
             <Card>
               <CardHeader title="Where it went" subtitle="Expenses by category" icon={<PieChart className="size-4" />} />
               <div className="p-4 sm:p-5">
-                {summary.categoryMatrix.length ? <CategoryDonut rows={summary.categoryMatrix} /> : <p className="text-sm text-zinc-500">No expenses in this range.</p>}
+                {summary.categoryMatrix.length ? <CategoryDonut rows={summary.categoryMatrix} /> : <p className="text-sm text-muted">No expenses in this range.</p>}
               </div>
             </Card>
           </div>
@@ -178,7 +178,7 @@ export const YearSummaryPage = () => {
             <CardHeader title="Monthly expenses summary" subtitle="Category by month, largest first" icon={<Table2 className="size-4" />} />
             <div className="mt-3">
               {summary.categoryMatrix.length === 0 ? (
-                <p className="px-5 pb-5 text-sm text-zinc-500">No expenses recorded in this range.</p>
+                <p className="px-5 pb-5 text-sm text-muted">No expenses recorded in this range.</p>
               ) : (
                 <Matrix head={['Category', ...summary.rows.map((r) => r.label), 'Total']}>
                   {summary.categoryMatrix.map((row) => (

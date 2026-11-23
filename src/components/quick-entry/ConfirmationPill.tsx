@@ -56,7 +56,7 @@ export const ConfirmationPill = ({ draft, onChange, onConfirm }: ConfirmationPil
               </optgroup>
             ))}
           </select>
-          <span className="pointer-events-none absolute right-2 text-zinc-400">▾</span>
+          <span className="pointer-events-none absolute right-2 text-subtle">▾</span>
         </label>
 
         {draft.target.kind === 'debt' && debts.length > 0 && (
@@ -74,12 +74,12 @@ export const ConfirmationPill = ({ draft, onChange, onConfirm }: ConfirmationPil
                 </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-2 text-zinc-400">▾</span>
+            <span className="pointer-events-none absolute right-2 text-subtle">▾</span>
           </label>
         )}
 
         <label className="relative inline-flex items-center gap-1 rounded-full bg-zinc-100 py-1 pl-2.5 pr-2.5 text-xs font-medium dark:bg-ink-800">
-          <CalendarDays className="size-3.5 text-zinc-500" />
+          <CalendarDays className="size-3.5 text-muted" />
           <span>{draft.date === todayISO() ? 'Today' : formatDateShort(draft.date)}</span>
           <input
             type="date"
@@ -100,7 +100,7 @@ export const ConfirmationPill = ({ draft, onChange, onConfirm }: ConfirmationPil
       <div className="mt-1 flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 dark:bg-ink-900">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{draft.description}</p>
-          <p className="truncate text-[11px] text-zinc-500">
+          <p className="truncate text-[11px] text-muted">
             {debtName ? `Linked to ${debtName}` : draft.matchedTerm ? `Matched “${draft.matchedTerm}”` : draft.source === 'ai' ? 'Parsed by Gemini' : 'No keyword matched, so pick a category'}
           </p>
         </div>

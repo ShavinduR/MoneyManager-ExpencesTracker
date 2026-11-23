@@ -9,6 +9,7 @@ import { MonthlyPage, MonthlyRedirect } from '@/features/monthly/MonthlyPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MorePage } from '@/features/settings/MorePage';
 import { BankAccountsPage } from '@/features/accounts/BankAccountsPage';
+import { RecoveryScreen } from '@/features/recovery/RecoveryScreen';
 import { YearlyGoalsPage } from '@/features/goals/YearlyGoalsPage';
 
 // Chart-heavy routes are split out so Recharts is not part of the initial bundle.
@@ -17,7 +18,7 @@ const DebtDetailPage = lazy(() => import('@/features/debts/DebtDetailPage'));
 const YearSummaryPage = lazy(() => import('@/features/summary/YearSummaryPage'));
 
 const RouteFallback = () => (
-  <div className="flex min-h-[50vh] items-center justify-center text-zinc-400">
+  <div className="flex min-h-[50vh] items-center justify-center text-subtle">
     <Loader2 className="size-5 animate-spin" aria-label="Loading" />
   </div>
 );
@@ -35,17 +36,15 @@ export const App = () => {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-dvh items-center justify-center text-zinc-400">
+      <div className="flex min-h-dvh items-center justify-center text-subtle">
         <Loader2 className="size-5 animate-spin" aria-label="Loading" />
       </div>
     );
   }
-  if (status === 'error') {
-    return <div className="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-red-600">Couldn’t open local storage. Check that this browser allows site data.</div>;
-  }
+  if (status === 'unreadable') return <RecoveryScreen />;
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<DashboardPage />} />

@@ -41,6 +41,10 @@ npm run typecheck    # tsc only
 ## UI conventions
 
 - Tailwind only, `class`-based dark mode. Design tokens (colors, radius) live in `src/styles/index.css` `@theme`.
+- Secondary text uses `text-muted` / `text-subtle` (AA in both themes). Don't use `text-zinc-400/500` for text, or 600-level green/accent/sky/amber text on light backgrounds; use the 700 shades.
+- Dialogs use `components/ui/Modal` (native `<dialog>` + `showModal()`); don't build ad-hoc overlays. Destructive actions use `ConfirmDialog`, never `window.confirm`.
+- Big amounts in cards use `<Money fit="xl|2xl|…">` so long values step down instead of overflowing; grids of cards need `[&>*]:min-w-0`.
+- No inline scripts (the CSP forbids them); put boot code in `public/`.
 - Mobile-first: bottom nav <768px, collapsible sidebar ≥768px. Tables become card lists on mobile.
 - Numbers use `tabular-nums`. Positive and negative amounts get semantic color plus a sign, never color alone.
 - Every list has an empty state with a clear next action.
@@ -48,7 +52,11 @@ npm run typecheck    # tsc only
 
 ## Data safety
 
-- Stored data and imports go through `migrateToLatest` (`src/data/migrations.ts`) and then zod. When changing the schema, bump `SCHEMA_VERSION`, add a migration step and a test.
+- **Loading never writes or deletes.** `FinanceRepository.load()` returns `empty | loaded(issues) | unreadable`. Stored data is migrated (`src/data/migrations.ts`) and then salvaged record by record (`src/data/salvage.ts`): one bad value is reported and set aside with a raw recovery copy, and never wipes the database. Don't reintroduce "on failure, start fresh" logic.
+- Imports use `parseImport` (structure + cross-record integrity + secret screening). When changing the schema, bump `SCHEMA_VERSION`, add a migration step and a test.
+- All amounts are bounded by `MAX_CENTS` (Rs. 1 trillion) in `parseMoney`, the quick-add parser and the schema.
+- Writes go through the store's `persist()`: failures surface as `saveError` with a retry, and successful writes notify other tabs (`src/data/sync.ts`) so a stale tab can't overwrite newer data.
+- Storage falls back IndexedDB → localStorage → memory (`ResilientRepository`); nothing touches storage at import time.
 - Device-only preferences (theme mirror, sidebar state, Gemini key) live in `src/lib/localPrefs.ts` and are never part of `FinanceData` or backups.
 
 ## Workflow

@@ -12,7 +12,7 @@ import { Field, Input, Select } from '@/components/ui/Field';
 import { Segmented } from '@/components/ui/Segmented';
 import { toast } from '@/components/ui/toast';
 import { formatMoney, fromMajor, parseSignedMoney, toInputString } from '@/lib/money';
-import { getGeminiKey, setGeminiKey } from '@/lib/localPrefs';
+import { DEFAULT_GEMINI_MODEL, getGeminiKey, getGeminiModel, isValidModelId, setGeminiKey, setGeminiModel } from '@/lib/localPrefs';
 import { formatBytes, getStorageInfo, requestPersistentStorage, type StorageInfo } from '@/lib/deviceStorage';
 import { backupStats, downloadBackup, readBackupFile, type BackupStats } from '@/data/backup';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -36,7 +36,7 @@ const StatsGrid = ({ stats }: { stats: BackupStats }) => (
     ).map(([label, value]) => (
       <div key={label} className="rounded-xl bg-zinc-50 px-2 py-2.5 dark:bg-ink-850">
         <dd className="text-lg font-semibold tabular">{value}</dd>
-        <dt className="text-[11px] text-zinc-500">{label}</dt>
+        <dt className="text-[11px] text-muted">{label}</dt>
       </div>
     ))}
   </dl>
@@ -63,7 +63,7 @@ const ProfileCard = () => {
   const save = (event: FormEvent): void => {
     event.preventDefault();
     const initialBalance = parseSignedMoney(form.initial || '0');
-    if (initialBalance === null) return toast.error('Starting balance must be a number');
+    if (initialBalance === null) return toast.error('Starting balance must be a number up to 1 trillion');
     if (form.email.trim() && !/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error('That email doesn’t look right');
     updateProfile({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), city: form.city.trim(), country: form.country.trim(), initialBalance });
     toast.success('Profile saved');
@@ -116,6 +116,7 @@ const AiCard = () => {
   const llmEnabled = useFinanceStore((s) => s.data.profile.llmEnabled);
   const updateProfile = useFinanceStore((s) => s.updateProfile);
   const [apiKey, setApiKey] = useState(getGeminiKey() ?? '');
+  const [model, setModel] = useState(getGeminiModel());
   return (
     <Card>
       <CardHeader title="AI quick-entry (optional)" subtitle="The offline parser always works; Gemini is an extra for free-form text" icon={<KeyRound className="size-4" />} />
@@ -129,6 +130,24 @@ const AiCard = () => {
             <div className="flex gap-2">
               <Input id={id} type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="AIza…" autoComplete="off" />
               <Button onClick={() => { setGeminiKey(apiKey); toast.success(apiKey.trim() ? 'Key saved on this device' : 'Key removed'); }}>Save</Button>
+            </div>
+          )}
+        </Field>
+        <Field label="Gemini model" hint={`Default ${DEFAULT_GEMINI_MODEL}. Change it if Google retires that model.`}>
+          {(id) => (
+            <div className="flex gap-2">
+              <Input id={id} value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_GEMINI_MODEL} autoComplete="off" spellCheck={false} />
+              <Button
+                onClick={() => {
+                  const next = model.trim() || DEFAULT_GEMINI_MODEL;
+                  if (!isValidModelId(next)) return toast.error('Model ids look like “gemini-2.5-flash”.');
+                  setGeminiModel(next);
+                  setModel(next);
+                  toast.success(`Using ${next}`);
+                }}
+              >
+                Save
+              </Button>
             </div>
           )}
         </Field>
@@ -176,7 +195,7 @@ const DataCard = () => {
           <Button icon={<Database className="size-4" />} onClick={() => setPending({ kind: 'demo' })}>Load sample data</Button>
           <Button variant="danger" icon={<RotateCcw className="size-4" />} onClick={() => setPending({ kind: 'reset' })} className="sm:ml-auto">Reset data</Button>
         </div>
-        <p className="flex gap-2 text-xs text-zinc-500">
+        <p className="flex gap-2 text-xs text-muted">
           <ShieldCheck className="size-4 shrink-0 text-accent-500" />
           Imports are validated before anything is replaced: unknown fields (like passwords on bank accounts), full card numbers and non-integer amounts are rejected.
         </p>
@@ -190,13 +209,15 @@ const DataCard = () => {
         onClose={() => setPending(null)}
         onConfirm={() => {
           if (pending?.kind !== 'import') return;
-          void replaceAll(pending.data).then(() => toast.success('Backup imported'));
+          void replaceAll(pending.data)
+            .then(() => toast.success('Backup imported'))
+            .catch(() => toast.error('Import failed. Your existing data was not changed.'));
         }}
       >
         {pending?.kind === 'import' && (
           <div className="space-y-3 text-sm">
             <StatsGrid stats={backupStats(pending.data)} />
-            <p className="text-xs text-zinc-500">Your current data ({current.months} months, {current.entries} entries) will be replaced. Export a backup first if you might need it.</p>
+            <p className="text-xs text-muted">Your current data ({current.months} months, {current.entries} entries) will be replaced. Export a backup first if you might need it.</p>
           </div>
         )}
       </ConfirmDialog>
@@ -206,7 +227,11 @@ const DataCard = () => {
         description="6 months of realistic LKR data, 2 debts, 4 goals and bank accounts. Your current data will be replaced."
         confirmLabel="Load sample data"
         onClose={() => setPending(null)}
-        onConfirm={() => void loadDemo().then(() => toast.success('Sample data loaded'))}
+        onConfirm={() =>
+          void loadDemo()
+            .then(() => toast.success('Sample data loaded'))
+            .catch(() => toast.error('Couldn’t load sample data. Your existing data was not changed.'))
+        }
       />
       <ConfirmDialog
         open={pending?.kind === 'reset'}
@@ -215,7 +240,11 @@ const DataCard = () => {
         confirmLabel="Delete everything"
         tone="danger"
         onClose={() => setPending(null)}
-        onConfirm={() => void resetAll().then(() => toast.success('All data cleared'))}
+        onConfirm={() =>
+          void resetAll()
+            .then(() => toast.success('All data cleared'))
+            .catch(() => toast.error('Reset failed. Your data is unchanged.'))
+        }
       />
     </Card>
   );
@@ -268,7 +297,7 @@ const DeviceCard = () => {
           ) : canInstall ? (
             <Button size="sm" variant="primary" onClick={() => void install()}>Install app</Button>
           ) : (
-            <span className="text-xs text-zinc-500">Use your browser’s “Install” or “Add to Home Screen”</span>
+            <span className="text-xs text-muted">Use your browser’s “Install” or “Add to Home Screen”</span>
           )}
         </div>
       </div>

@@ -66,7 +66,3 @@ export const summarizeYear = (summaries: Map<MonthKey, MonthSummary>, year: numb
     cumulativeSavings,
   };
 };
-
-/** Years that have at least one recorded month, plus the current year, descending. */
-export const availableYears = (monthKeys: readonly MonthKey[], currentYear: number): number[] =>
-  [...new Set([currentYear, ...monthKeys.map((k) => Number(k.slice(0, 4)))])].sort((a, b) => b - a);

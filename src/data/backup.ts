@@ -1,7 +1,11 @@
 import type { BackupEnvelope, FinanceData } from '@/types/finance';
-import { parseAndMigrate } from './schema';
+import { parseImport } from './schema';
+import { toISODate } from '@/lib/dates';
 
 export const BACKUP_APP_ID = 'mindset-finance-planner';
+
+/** Real backups are well under 1 MB; anything far larger is refused before it is read into memory. */
+export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
 export const createBackup = (data: FinanceData, now: Date = new Date()): BackupEnvelope => ({
   app: BACKUP_APP_ID,
@@ -22,6 +26,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  * "password" are rejected by the strict schema).
  */
 export const parseBackupText = (text: string): BackupParseResult => {
+  if (text.length > MAX_IMPORT_BYTES) return { ok: false, error: 'File is too large to be a backup (limit 5 MB).' };
   let json: unknown;
   try {
     json = JSON.parse(text);
@@ -33,7 +38,7 @@ export const parseBackupText = (text: string): BackupParseResult => {
   const payload = 'data' in json ? json.data : json;
   const exportedAt = typeof json.exportedAt === 'string' ? json.exportedAt : null;
 
-  const parsed = parseAndMigrate(payload);
+  const parsed = parseImport(payload);
   return parsed.ok ? { ok: true, data: parsed.value, exportedAt } : { ok: false, error: `Backup is invalid: ${parsed.error}` };
 };
 
@@ -48,19 +53,26 @@ export const backupStats = (data: FinanceData): BackupStats => ({
   goals: Object.values(data.yearPlans).reduce((n, p) => n + p.goals.filter((g) => g.title.trim()).length, 0),
 });
 
-export const backupFileName = (now: Date = new Date()): string => `mindset-planner-backup-${now.toISOString().slice(0, 10)}.json`;
+/** Uses the LOCAL date (L12): an export at 9 pm in Colombo is named for today, not tomorrow (UTC). */
+export const backupFileName = (now: Date = new Date()): string => `mindset-planner-backup-${toISODate(now)}.json`;
 
 /** Browser-only: triggers a download of the backup file. */
-export const downloadBackup = (data: FinanceData): void => {
-  const blob = new Blob([serializeBackup(data)], { type: 'application/json' });
+export const downloadBackup = (data: FinanceData): void => downloadJson(createBackup(data), backupFileName());
+
+export const readBackupFile = async (file: File): Promise<BackupParseResult> =>
+  file.size > MAX_IMPORT_BYTES
+    ? { ok: false, error: `File is too large to be a backup (${(file.size / 1024 / 1024).toFixed(1)} MB; limit 5 MB).` }
+    : parseBackupText(await file.text());
+
+/** Browser-only: downloads whatever is in storage, unvalidated, so nothing is ever unrecoverable. */
+export const downloadJson = (value: unknown, fileName: string): void => {
+  const blob = new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = backupFileName();
+  a.download = fileName;
   document.body.append(a);
   a.click();
   a.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
-
-export const readBackupFile = async (file: File): Promise<BackupParseResult> => parseBackupText(await file.text());

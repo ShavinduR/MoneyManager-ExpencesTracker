@@ -25,27 +25,27 @@ const DebtCard = ({ debt }: { debt: DebtAccount }) => {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate font-semibold tracking-tight">{debt.creditor}</p>
-            <p className="font-mono text-xs text-zinc-500">{maskLast4(debt.accountRef)}</p>
+            <p className="font-mono text-xs text-muted">{maskLast4(debt.accountRef)}</p>
           </div>
           <Badge tone={debt.interestRateApr === 0 ? 'green' : debt.interestRateApr >= 20 ? 'red' : 'amber'}>
             {debt.interestRateApr === 0 ? '0% interest' : `${debt.interestRateApr}% APR`}
           </Badge>
         </div>
         <div className="mt-5">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Remaining</p>
-          <Money value={progress.remaining} className="text-2xl font-semibold tracking-tight" />
-          <p className="text-xs text-zinc-500">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Remaining</p>
+          <Money value={progress.remaining} fit="2xl" className="block font-semibold tracking-tight" />
+          <p className="text-xs text-muted">
             of <Money value={debt.startingBalance} /> · {Math.round(progress.progress * 100)}% paid off
           </p>
         </div>
         <ProgressBar value={progress.progress} className="mt-3" />
         {debt.motivation && (
-          <p className="mt-4 flex gap-2 text-xs italic text-zinc-500">
+          <p className="mt-4 flex gap-2 text-xs italic text-muted">
             <Quote className="size-3.5 shrink-0" />
             <span className="line-clamp-2">{debt.motivation}</span>
           </p>
         )}
-        <div className="mt-auto flex items-center justify-between pt-4 text-xs text-zinc-500">
+        <div className="mt-auto flex items-center justify-between pt-4 text-xs text-muted">
           <span>
             Min <Money value={debt.minimumPayment} />
             {debt.goalPayoffDate && ` · goal ${formatMonthLong(monthKeyOf(debt.goalPayoffDate))}`}
@@ -76,10 +76,10 @@ export const DebtsPage = () => {
       {active.length > 0 && (
         <Card className="mb-4 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
           <div>
-            <p className="text-xs font-medium text-zinc-500">Total remaining across {active.length} debt{active.length > 1 ? 's' : ''}</p>
-            <Money value={totalDebtRemaining(debts, months)} className="text-2xl font-semibold tracking-tight" />
+            <p className="text-xs font-medium text-muted">Total remaining across {active.length} debt{active.length > 1 ? 's' : ''}</p>
+            <Money value={totalDebtRemaining(debts, months)} fit="2xl" className="block font-semibold tracking-tight" />
           </div>
-          <p className="max-w-sm text-xs text-zinc-500">Open a debt to log payments, see its full history and run the payoff simulator.</p>
+          <p className="max-w-sm text-xs text-muted">Open a debt to log payments, see its full history and run the payoff simulator.</p>
         </Card>
       )}
 
@@ -93,15 +93,15 @@ export const DebtsPage = () => {
           />
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
           {active.map((d) => <DebtCard key={d.id} debt={d} />)}
         </div>
       )}
 
       {archived.length > 0 && (
         <div className="mt-8">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-500">Paid off & archived</h2>
-          <div className="grid gap-3 opacity-75 sm:grid-cols-2 xl:grid-cols-3">
+          <h2 className="mb-3 text-sm font-semibold text-muted">Paid off & archived</h2>
+          <div className="grid gap-3 opacity-75 sm:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
             {archived.map((d) => <DebtCard key={d.id} debt={d} />)}
           </div>
         </div>

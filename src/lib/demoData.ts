@@ -45,7 +45,7 @@ const REFLECTIONS: readonly string[] = [
   'Automating the unit trust deposit on salary day means I never “see” that money, and I don’t miss it.',
   'Paying more than the minimum on the card feels slow, but the interest line on the statement is finally shrinking.',
   'The emergency fund gave me calm when the car needed repairs. No panic, no new loan.',
-  'Small, consistent steps beat big resolutions. I am richer than I think when I look at the whole picture.',
+  'Small, consistent steps beat big resolutions. Seeing the whole year on one page showed me how far I’ve come.',
 ];
 
 const NOTES: readonly string[] = [

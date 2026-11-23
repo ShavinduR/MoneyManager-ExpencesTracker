@@ -43,7 +43,7 @@ export const Toaster = () => {
             key={t.id}
             className="pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl bg-zinc-900 py-2.5 pl-3.5 pr-2 text-sm text-white shadow-xl animate-pop-in dark:bg-zinc-100 dark:text-zinc-900"
           >
-            <Icon className={cn('size-4 shrink-0', t.tone === 'error' ? 'text-red-400 dark:text-red-600' : 'text-accent-400 dark:text-accent-600')} />
+            <Icon className={cn('size-4 shrink-0', t.tone === 'error' ? 'text-red-400 dark:text-red-600' : 'text-accent-400 dark:text-accent-700')} />
             <span className="min-w-0 flex-1">{t.message}</span>
             {t.action ? (
               <button

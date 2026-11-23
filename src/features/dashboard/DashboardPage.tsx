@@ -30,7 +30,7 @@ const Welcome = () => {
       <Card className="overflow-hidden">
         <div className="relative px-6 py-10 sm:px-10 sm:py-14">
           <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-accent-500/10 blur-3xl" />
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-400">You are richer than you think</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-700 dark:text-accent-400">Clarity over your money, one month at a time.</p>
           <h1 className="mt-3 max-w-xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Your 4-year finance planner, now automatic.</h1>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
             Track income, savings, debt and bills month by month. Totals, carry-over balances and yearly summaries calculate themselves. Your data stays on this device and works offline.
@@ -40,7 +40,9 @@ const Welcome = () => {
               variant="primary"
               icon={<Database className="size-4" />}
               onClick={() => {
-                void loadDemo().then(() => toast.success('Sample data loaded: 6 months, 2 debts, 4 goals'));
+                void loadDemo()
+                  .then(() => toast.success('Sample data loaded: 6 months, 2 debts, 4 goals'))
+                  .catch(() => toast.error('Couldn’t save sample data on this device.'));
               }}
             >
               Load sample data
@@ -59,7 +61,7 @@ const Welcome = () => {
             <div key={title} className="bg-white p-5 dark:bg-ink-900">
               <Icon className="size-4 text-accent-500" />
               <p className="mt-2 text-sm font-medium">{title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-zinc-500">{text}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted">{text}</p>
             </div>
           ))}
         </div>
@@ -91,7 +93,7 @@ export const DashboardPage = () => {
     <div className="animate-fade-up space-y-4">
       <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-zinc-500">{greeting()}{name ? `, ${name.split(' ')[0]}` : ''}</p>
+          <p className="text-sm text-muted">{greeting()}{name ? `, ${name.split(' ')[0]}` : ''}</p>
           <h1 className="text-2xl font-semibold tracking-tight">{MONTH_LABELS_LONG[monthNumber - 1]} at a glance</h1>
         </div>
         <Link to={`/monthly/${month}`}>
@@ -161,14 +163,14 @@ export const DashboardPage = () => {
                   <ProgressBar value={goalsDone / goals.length} />
                   <ul className="mt-3 space-y-1.5">
                     {goals.slice(0, 5).map((g) => (
-                      <li key={g.id} className={cn('truncate text-sm', g.done ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-300')}>
+                      <li key={g.id} className={cn('truncate text-sm', g.done ? 'text-subtle line-through' : 'text-zinc-700 dark:text-zinc-300')}>
                         {g.text}
                       </li>
                     ))}
                   </ul>
                 </>
               ) : (
-                <Link to={`/monthly/${month}`} className="text-sm text-accent-600 hover:underline dark:text-accent-400">Add this month’s goals →</Link>
+                <Link to={`/monthly/${month}`} className="text-sm text-accent-700 hover:underline dark:text-accent-400">Add this month’s goals →</Link>
               )}
             </div>
           </Card>
@@ -183,7 +185,7 @@ export const DashboardPage = () => {
                   <li key={e.id} className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{e.description}</p>
-                      <p className="text-xs text-zinc-500">{formatDateShort(e.date)} · {categoryLabel(e.kind, e.category)}</p>
+                      <p className="text-xs text-muted">{formatDateShort(e.date)} · {categoryLabel(e.kind, e.category)}</p>
                     </div>
                     <Money value={e.amount} signed={e.kind === 'income'} tone={e.kind === 'income' ? 'positive' : 'none'} className="text-sm font-medium" />
                   </li>

@@ -36,8 +36,8 @@ const GoalRow = ({ goal, index, month, removable }: { goal: MonthGoal; index: nu
         aria-label={`Goal ${index + 1}`}
         maxLength={120}
         className={cn(
-          'h-9 min-w-0 flex-1 border-b border-dashed border-transparent bg-transparent text-sm placeholder:text-zinc-300 hover:border-zinc-200 focus:border-accent-500 focus:outline-none dark:placeholder:text-zinc-600 dark:hover:border-ink-700',
-          goal.done && 'text-zinc-400 line-through decoration-zinc-300',
+          'h-9 min-w-0 flex-1 border-b border-dashed border-transparent bg-transparent text-sm placeholder:text-subtle hover:border-zinc-200 focus:border-accent-500 focus:outline-none dark:placeholder:text-subtle dark:hover:border-ink-700',
+          goal.done && 'text-subtle line-through decoration-zinc-300',
         )}
       />
       {removable && (

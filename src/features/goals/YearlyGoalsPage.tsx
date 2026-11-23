@@ -34,26 +34,26 @@ const GoalCard = ({ goal, onOpen }: { goal: YearlyGoal; onOpen: () => void }) =>
       <span
         className={cn(
           'flex size-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold tabular',
-          goal.status === 'achieved' ? 'bg-accent-500 text-white dark:text-ink-950' : empty ? 'bg-zinc-100 text-zinc-400 dark:bg-ink-850' : 'bg-zinc-900 text-white dark:bg-ink-800',
+          goal.status === 'achieved' ? 'bg-accent-500 text-white dark:text-ink-950' : empty ? 'bg-zinc-100 text-subtle dark:bg-ink-850' : 'bg-zinc-900 text-white dark:bg-ink-800',
         )}
       >
         {goal.status === 'achieved' ? <Trophy className="size-4" /> : goal.slot}
       </span>
       <div className="min-w-0 flex-1">
         {empty ? (
-          <p className="flex items-center gap-1.5 pt-2 text-sm text-zinc-400 group-hover:text-accent-600 dark:group-hover:text-accent-400">
+          <p className="flex items-center gap-1.5 pt-2 text-sm text-subtle group-hover:text-accent-700 dark:group-hover:text-accent-400">
             <Plus className="size-3.5" /> Set goal {goal.slot}
           </p>
         ) : (
           <>
             <div className="flex items-start justify-between gap-2">
-              <p className={cn('font-medium leading-snug text-pretty', goal.status === 'achieved' && 'text-zinc-500 line-through decoration-zinc-300 dark:text-zinc-400')}>{goal.title}</p>
+              <p className={cn('font-medium leading-snug text-pretty', goal.status === 'achieved' && 'text-muted line-through decoration-zinc-300 dark:text-zinc-400')}>{goal.title}</p>
               <Badge tone={STATUS_TONE[goal.status]}>{GOAL_STATUS_LABELS[goal.status]}</Badge>
             </div>
             {progress !== null && (
               <div className="mt-3">
                 <ProgressBar value={progress} />
-                <p className="mt-1.5 flex justify-between text-xs text-zinc-500">
+                <p className="mt-1.5 flex justify-between text-xs text-muted">
                   <span>
                     <Money value={goal.currentAmount} className="font-medium text-zinc-700 dark:text-zinc-300" />
                     {goal.targetAmount !== null && <> of <Money value={goal.targetAmount} /></>}
@@ -62,7 +62,7 @@ const GoalCard = ({ goal, onOpen }: { goal: YearlyGoal; onOpen: () => void }) =>
                 </p>
               </div>
             )}
-            {goal.notes && <p className="mt-2 line-clamp-2 text-xs text-zinc-500">{goal.notes}</p>}
+            {goal.notes && <p className="mt-2 line-clamp-2 text-xs text-muted">{goal.notes}</p>}
           </>
         )}
       </div>
@@ -109,12 +109,12 @@ const YearView = ({ year, plan }: { year: number; plan: YearPlan }) => {
             onCommit={(commitment) => updateYearPlan(year, (p) => ({ ...p, commitment }))}
             placeholder="Write your commitment for the year in one or two sentences."
             bare
-            className="mt-2 block min-h-16 w-full resize-none rounded-lg bg-transparent text-lg font-medium leading-relaxed tracking-tight text-balance placeholder:text-zinc-400 focus:outline-none"
+            className="mt-2 block min-h-16 w-full resize-none rounded-lg bg-transparent px-1 text-lg font-medium leading-relaxed tracking-tight text-balance placeholder:text-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/60"
           />
-          <div className="mt-2 flex flex-wrap gap-4 text-xs text-zinc-500">
+          <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted">
             <span><b className="text-zinc-800 dark:text-zinc-200">{stats.set}</b> of 8 goals set</span>
-            <span><b className="text-emerald-600 dark:text-emerald-400">{stats.achieved}</b> achieved</span>
-            <span><b className="text-sky-600 dark:text-sky-400">{stats.inProgress}</b> in progress</span>
+            <span><b className="text-emerald-700 dark:text-emerald-400">{stats.achieved}</b> achieved</span>
+            <span><b className="text-sky-700 dark:text-sky-400">{stats.inProgress}</b> in progress</span>
           </div>
         </div>
       </Card>
@@ -126,6 +126,9 @@ const YearView = ({ year, plan }: { year: number; plan: YearPlan }) => {
       <Card className="mt-4">
         <CardHeader title="My mind map" subtitle="Free-form space for ideas, dreams and connections" icon={<Lightbulb className="size-4" />} />
         <div className="p-4 sm:p-5">
+          <label htmlFor={`mindmap-${year}`} className="sr-only">
+            My mind map for {year}
+          </label>
           <AutosaveArea
             id={`mindmap-${year}`}
             value={plan.mindMap}
