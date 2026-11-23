@@ -105,7 +105,7 @@ Type a sentence and press Enter:
 ### Profile and settings
 - Name, email, phone, city and country (all optional, all local), currency (LKR, USD, EUR, GBP, INR, AUD) and light / dark / system theme.
 - **Sync devices**: move everything to another phone or computer by QR code or a 6-digit code, encrypted end to end (see [Device sync](#device-sync-encrypted-peer-to-peer)).
-- JSON export, import with a preview of what's inside before anything is replaced, and reset. Both destructive actions use a confirmation dialog and report failures.
+- JSON export, import with a preview of what's inside before anything is replaced, and reset. Both destructive actions use a confirmation dialog and report failures. **Reset data** shows exactly what will be deleted, offers a backup download, and stays locked until you type a fresh random 4-digit code, so a stray tap can't wipe the planner.
 - An optional Gemini **model** setting, so the AI button keeps working when Google retires a model version.
 - Storage usage, a "Keep my data" request for persistent storage, an install button and online/offline status.
 
@@ -296,7 +296,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
 
 ## Testing
 
-232 unit tests cover the parts where a bug costs real money or trust:
+235 unit tests cover the parts where a bug costs real money or trust:
 
 - **Money:** cent math, parsing (`1,500`, `1,50,000`, `1.5k`, `2 lakh`, `850/-`, negatives), the Rs. 1 trillion limit, LKR formatting, compact axis labels.
 - **Month summary and carry-over:** totals, difference, balance forward, biggest and smallest area, skipped months, overrides, settled bills.
@@ -318,6 +318,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
   - Full sender ↔ receiver sessions over an in-memory transport for both QR and code pairing: identical data arrives, nothing is sent before approval, declines, wrong codes, forged QR keys, tampering in transit, malformed messages, one device per code, 5-minute expiry, the 15-second timeout and teardown.
   - Payloads with a password field, secret-looking notes, amounts over `MAX_CENTS`, foreign files and anything over 5 MB are rejected by the import pipeline.
   - The payload never contains the Gemini key or any device preference.
+- **Reset confirmation codes:** always 4 digits, never a repeated digit, no modulo bias, exact matching only.
 - **Onboarding:** each checklist step completes from real data, dismissal hides it, and its flags are device-only.
 - **Storage (`fake-indexeddb`):**
   - Save and reload, and `empty` vs. `loaded` vs. `unreadable` results.

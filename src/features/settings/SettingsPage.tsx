@@ -19,6 +19,7 @@ import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useOnboardingStore } from '@/store/onboardingStore';
 import { useUiStore } from '@/store/uiStore';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { ResetDataDialog } from './ResetDataDialog';
 
 const isCurrency = (v: string): v is (typeof CURRENCY_CODES)[number] => CURRENCY_CODES.some((c) => c === v);
 
@@ -182,7 +183,6 @@ const DataCard = () => {
     return () => observer.disconnect();
   }, [markProtected]);
   const data = useFinanceStore((s) => s.data);
-  const resetAll = useFinanceStore((s) => s.resetAll);
   const replaceAll = useFinanceStore((s) => s.replaceAll);
   const openSync = useUiStore((s) => s.openSync);
   const [pending, setPending] = useState<Pending>(null);
@@ -244,19 +244,7 @@ const DataCard = () => {
           </div>
         )}
       </ConfirmDialog>
-      <ConfirmDialog
-        open={pending?.kind === 'reset'}
-        title="Delete all data on this device?"
-        description="This can’t be undone. Export a backup first if you might need it."
-        confirmLabel="Delete everything"
-        tone="danger"
-        onClose={() => setPending(null)}
-        onConfirm={() =>
-          void resetAll()
-            .then(() => toast.success('All data cleared'))
-            .catch(() => toast.error('Reset failed. Your data is unchanged.'))
-        }
-      />
+      <ResetDataDialog open={pending?.kind === 'reset'} onClose={() => setPending(null)} />
     </Card>
   );
 };

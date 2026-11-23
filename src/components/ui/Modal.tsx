@@ -30,7 +30,8 @@ export const Modal = ({ open, onClose, title, description, children, footer }: M
     const previouslyFocused = document.activeElement;
     if (!dialog.open) dialog.showModal();
     document.body.style.overflow = 'hidden';
-    dialog.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')?.focus();
+    // Prefer a field marked data-autofocus, else the first control.
+    (dialog.querySelector<HTMLElement>('[data-autofocus]') ?? dialog.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])'))?.focus();
 
     const onCancel = (event: Event): void => {
       // Escape: let React state drive closing so parent state stays in sync.

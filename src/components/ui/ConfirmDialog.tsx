@@ -9,11 +9,13 @@ type ConfirmDialogProps = {
   children?: ReactNode;
   confirmLabel: string;
   tone?: 'primary' | 'danger';
+  /** Keeps the confirm button disabled until an extra check passes (e.g. a typed code). */
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 };
 
-export const ConfirmDialog = ({ open, title, description, children, confirmLabel, tone = 'primary', onConfirm, onClose }: ConfirmDialogProps) => (
+export const ConfirmDialog = ({ open, title, description, children, confirmLabel, tone = 'primary', confirmDisabled = false, onConfirm, onClose }: ConfirmDialogProps) => (
   <Modal
     open={open}
     onClose={onClose}
@@ -24,6 +26,7 @@ export const ConfirmDialog = ({ open, title, description, children, confirmLabel
         <Button variant="ghost" onClick={onClose}>Cancel</Button>
         <Button
           variant={tone === 'danger' ? 'danger' : 'primary'}
+          disabled={confirmDisabled}
           onClick={() => {
             onConfirm();
             onClose();
