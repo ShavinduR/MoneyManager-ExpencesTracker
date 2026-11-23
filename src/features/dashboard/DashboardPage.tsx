@@ -40,7 +40,9 @@ const Welcome = () => {
               variant="primary"
               icon={<Database className="size-4" />}
               onClick={() => {
-                void loadDemo().then(() => toast.success('Sample data loaded: 6 months, 2 debts, 4 goals'));
+                void loadDemo()
+                  .then(() => toast.success('Sample data loaded: 6 months, 2 debts, 4 goals'))
+                  .catch(() => toast.error('Couldn’t save sample data on this device.'));
               }}
             >
               Load sample data

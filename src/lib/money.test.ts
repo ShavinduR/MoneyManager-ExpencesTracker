@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cents, formatAxis, formatMoney, fromMajor, parseMoney, parseSignedMoney, sumCents } from './money';
+import { cents, formatAxis, formatMoney, fromMajor, isWithinLimit, MAX_CENTS, parseMoney, parseSignedMoney, sumCents } from './money';
 
 describe('money', () => {
   it('avoids floating point drift by summing integer cents', () => {
@@ -44,5 +44,20 @@ describe('money', () => {
     [fromMajor(2_000_000_000), '2B'],
   ])('formatAxis(%s) → %s', (value, expected) => {
     expect(formatAxis(value)).toBe(expected);
+  });
+
+  it('caps amounts at Rs. 1 trillion so cents stay exact (C1)', () => {
+    expect(Number.isSafeInteger(MAX_CENTS)).toBe(true);
+    expect(parseMoney('1000000000000')).toBe(MAX_CENTS);
+    expect(parseMoney('1000000000000.01')).toBeNull();
+    expect(parseMoney('99999999999999999')).toBeNull();
+    expect(parseSignedMoney('-99999999999999999')).toBeNull();
+    expect(isWithinLimit(1e19)).toBe(false);
+    expect(isWithinLimit(-MAX_CENTS)).toBe(true);
+  });
+
+  it('accepts the Sri Lankan "/-" suffix', () => {
+    expect(parseMoney('850/-')).toBe(fromMajor(850));
+    expect(parseMoney('1,50,000')).toBe(fromMajor(150000));
   });
 });

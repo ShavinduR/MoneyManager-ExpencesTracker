@@ -33,7 +33,9 @@ const ResultTile = ({ title, result, highlight }: { title: string; result: Payof
     ) : result.kind === 'never' ? (
       <>
         <p className="mt-1 text-lg font-semibold tracking-tight text-red-600 dark:text-red-400">Never</p>
-        <p className="text-xs text-zinc-500">{result.reason === 'too-long' ? 'Takes over 50 years' : 'Payment doesn’t cover interest'}</p>
+        <p className="text-xs text-zinc-500">
+          {result.reason === 'too-long' ? 'Takes over 50 years' : result.reason === 'invalid-input' ? 'Check the rate and amounts' : 'Payment doesn’t cover interest'}
+        </p>
       </>
     ) : (
       <p className="mt-1 text-lg font-semibold">Paid off 🎉</p>
@@ -60,7 +62,8 @@ export const PayoffSimulator = ({ debt, remaining }: Props) => {
   const neededForGoal = monthsToGoal !== null && monthsToGoal > 0 ? requiredMonthlyPayment(remaining, debt.interestRateApr, monthsToGoal) : null;
   const accelerated = comparison.accelerated;
   const onTrack = goalMonth && accelerated.kind === 'paid-off' ? accelerated.payoffMonth <= goalMonth : null;
-  const firstInterest = comparison.baseline.kind === 'never' ? comparison.baseline.firstMonthInterest : null;
+  const firstInterest =
+    comparison.baseline.kind === 'never' && comparison.baseline.reason === 'payment-below-interest' ? comparison.baseline.firstMonthInterest : null;
 
   if (remaining <= 0) return null;
 

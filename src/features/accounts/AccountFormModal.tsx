@@ -40,13 +40,13 @@ export const AccountFormModal = ({ open, onClose, account, onSave }: Props) => {
   }, [open, account]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]): void => setForm((f) => ({ ...f, [key]: value }));
-  const secretWarning = looksLikeSecret(`${form.notes} ${form.name} ${form.branch}`);
+  const secretWarning = [form.name, form.institution, form.branch, form.notes].some(looksLikeSecret);
 
   const submit = (event: FormEvent): void => {
     event.preventDefault();
     const balance = parseSignedMoney(form.balance || '0');
     if (!form.name.trim()) return setError('Give the account a name, e.g. “Salary account”.');
-    if (balance === null) return setError('Balance must be a number. Use “-” for money owed, e.g. -65000.');
+    if (balance === null) return setError('Balance must be a number up to 1 trillion. Use “-” for money owed, e.g. -65000.');
     if (form.cardLast4 && !/^\d{4}$/.test(form.cardLast4)) return setError('Card reference must be exactly the last 4 digits.');
     if (secretWarning) return setError('This looks like a password, PIN or full card number. Remove it. This app never stores credentials.');
     onSave({

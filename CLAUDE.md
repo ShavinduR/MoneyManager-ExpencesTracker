@@ -48,7 +48,11 @@ npm run typecheck    # tsc only
 
 ## Data safety
 
-- Stored data and imports go through `migrateToLatest` (`src/data/migrations.ts`) and then zod. When changing the schema, bump `SCHEMA_VERSION`, add a migration step and a test.
+- **Loading never writes or deletes.** `FinanceRepository.load()` returns `empty | loaded(issues) | unreadable`. Stored data is migrated (`src/data/migrations.ts`) and then salvaged record by record (`src/data/salvage.ts`): one bad value is reported and set aside with a raw recovery copy, and never wipes the database. Don't reintroduce "on failure, start fresh" logic.
+- Imports use `parseImport` (structure + cross-record integrity + secret screening). When changing the schema, bump `SCHEMA_VERSION`, add a migration step and a test.
+- All amounts are bounded by `MAX_CENTS` (Rs. 1 trillion) in `parseMoney`, the quick-add parser and the schema.
+- Writes go through the store's `persist()`: failures surface as `saveError` with a retry, and successful writes notify other tabs (`src/data/sync.ts`) so a stale tab can't overwrite newer data.
+- Storage falls back IndexedDB → localStorage → memory (`ResilientRepository`); nothing touches storage at import time.
 - Device-only preferences (theme mirror, sidebar state, Gemini key) live in `src/lib/localPrefs.ts` and are never part of `FinanceData` or backups.
 
 ## Workflow

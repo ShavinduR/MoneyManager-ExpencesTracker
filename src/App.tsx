@@ -9,6 +9,7 @@ import { MonthlyPage, MonthlyRedirect } from '@/features/monthly/MonthlyPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MorePage } from '@/features/settings/MorePage';
 import { BankAccountsPage } from '@/features/accounts/BankAccountsPage';
+import { RecoveryScreen } from '@/features/recovery/RecoveryScreen';
 import { YearlyGoalsPage } from '@/features/goals/YearlyGoalsPage';
 
 // Chart-heavy routes are split out so Recharts is not part of the initial bundle.
@@ -40,9 +41,7 @@ export const App = () => {
       </div>
     );
   }
-  if (status === 'error') {
-    return <div className="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-red-600">Couldn’t open local storage. Check that this browser allows site data.</div>;
-  }
+  if (status === 'unreadable') return <RecoveryScreen />;
 
   return (
     <BrowserRouter>

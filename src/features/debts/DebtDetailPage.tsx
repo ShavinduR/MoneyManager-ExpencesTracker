@@ -94,7 +94,19 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
             {[
               { label: 'Starting balance', value: <Money value={debt.startingBalance} /> },
               { label: 'Minimum payment', value: <Money value={debt.minimumPayment} /> },
-              { label: 'Paid so far', value: <Money value={progress.totalPaid} tone="positive" /> },
+              {
+                label: progress.plannedCount ? `Paid so far (+ planned)` : 'Paid so far',
+                value: (
+                  <>
+                    <Money value={progress.totalPaid} tone="positive" />
+                    {progress.plannedCount > 0 && (
+                      <span className="ml-1 text-xs font-normal text-zinc-500">
+                        + <Money value={progress.plannedTotal} />
+                      </span>
+                    )}
+                  </>
+                ),
+              },
               { label: 'Goal payoff date', value: debt.goalPayoffDate ? formatMonthLong(monthKeyOf(debt.goalPayoffDate)) : '—' },
             ].map((item) => (
               <div key={item.label}>
@@ -132,7 +144,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
         <Card className="xl:col-span-2">
           <CardHeader
             title="Payment history"
-            subtitle={`${progress.paymentCount} payment${progress.paymentCount === 1 ? '' : 's'} · from your monthly tracker`}
+            subtitle={`${progress.paymentCount} paid${progress.plannedCount ? ` · ${progress.plannedCount} planned` : ''} · from your monthly tracker`}
             icon={<History className="size-4" />}
             action={<Button size="sm" icon={<Plus className="size-3.5" />} onClick={() => { setEditingPayment(null); setPaymentOpen(true); }}>Log</Button>}
           />
@@ -156,10 +168,11 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
                     <tr key={row.entryId} className="group border-b border-zinc-100/70 last:border-0 dark:border-ink-800/60">
                       <td className="py-2.5 pl-4 sm:pl-5">
                         <Link to={`/monthly/${row.month}`} className="whitespace-nowrap text-xs tabular hover:underline">{formatDateShort(row.date)} ’{row.date.slice(2, 4)}</Link>
+                        {!row.cleared && <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400">Planned: not counted yet</p>}
                         {row.notes && <p className="max-w-32 truncate text-[11px] text-zinc-500">{row.notes}</p>}
                       </td>
-                      <td className="py-2.5 text-right font-medium"><Money value={row.amountPaid} /></td>
-                      <td className="py-2.5 pr-2 text-right text-zinc-500"><Money value={row.remainingBalance} /></td>
+                      <td className={row.cleared ? 'py-2.5 text-right font-medium' : 'py-2.5 text-right italic text-zinc-500'}><Money value={row.amountPaid} /></td>
+                      <td className="py-2.5 pr-2 text-right text-zinc-500">{row.cleared ? <Money value={row.remainingBalance} /> : '—'}</td>
                       <td className="py-2.5 pr-3">
                         {entry && (
                           <div className="flex justify-end opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">

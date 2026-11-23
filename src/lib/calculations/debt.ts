@@ -6,7 +6,12 @@ export type DebtPaymentRow = {
   month: MonthKey;
   date: string;
   amountPaid: Cents;
-  /** Starting balance minus cumulative payments, floored at 0. */
+  /**
+   * Planned (not yet cleared) payments are listed but do NOT reduce the balance (audit finding M1).
+   * Tick the payment as paid in the monthly tracker or payment log to count it.
+   */
+  cleared: boolean;
+  /** Starting balance minus cumulative CLEARED payments, floored at 0. */
   remainingBalance: Cents;
   notes: string;
   description: string;
@@ -23,12 +28,13 @@ export const linkedPayments = (debtId: Id, months: Record<MonthKey, MonthRecord>
 export const debtPaymentHistory = (debt: DebtAccount, months: Record<MonthKey, MonthRecord>): DebtPaymentRow[] => {
   let remaining: Cents = debt.startingBalance;
   return linkedPayments(debt.id, months).map((entry) => {
-    remaining = maxCents(ZERO, subCents(remaining, entry.amount));
+    if (entry.cleared) remaining = maxCents(ZERO, subCents(remaining, entry.amount));
     return {
       entryId: entry.id,
       month: entry.month,
       date: entry.date,
       amountPaid: entry.amount,
+      cleared: entry.cleared,
       remainingBalance: remaining,
       notes: entry.notes,
       description: entry.description,
@@ -36,16 +42,28 @@ export const debtPaymentHistory = (debt: DebtAccount, months: Record<MonthKey, M
   });
 };
 
-export type DebtProgress = { totalPaid: Cents; remaining: Cents; progress: number; paymentCount: number };
+export type DebtProgress = {
+  /** Cleared payments only. */
+  totalPaid: Cents;
+  /** Linked payments not yet marked as paid. */
+  plannedTotal: Cents;
+  remaining: Cents;
+  progress: number;
+  paymentCount: number;
+  plannedCount: number;
+};
 
 export const debtProgress = (debt: DebtAccount, history: readonly DebtPaymentRow[]): DebtProgress => {
-  const totalPaid = sumCents(history.map((r) => r.amountPaid));
+  const cleared = history.filter((r) => r.cleared);
+  const planned = history.filter((r) => !r.cleared);
   const remaining = history.at(-1)?.remainingBalance ?? debt.startingBalance;
   return {
-    totalPaid,
+    totalPaid: sumCents(cleared.map((r) => r.amountPaid)),
+    plannedTotal: sumCents(planned.map((r) => r.amountPaid)),
     remaining,
     progress: debt.startingBalance > 0 ? Math.min(1, (debt.startingBalance - remaining) / debt.startingBalance) : 1,
-    paymentCount: history.length,
+    paymentCount: cleared.length,
+    plannedCount: planned.length,
   };
 };
 

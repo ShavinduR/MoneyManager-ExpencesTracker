@@ -31,8 +31,8 @@ export const GoalFormModal = ({ open, onClose, goal, year, onSave }: Props) => {
     event.preventDefault();
     const targetAmount = target.trim() ? parseMoney(target) : null;
     const currentAmount = current.trim() ? parseMoney(current) : ZERO;
-    if (target.trim() && targetAmount === null) return setError('Target must be a number, or leave it empty.');
-    if (currentAmount === null) return setError('Progress must be a number.');
+    if (target.trim() && targetAmount === null) return setError('Target must be a number up to 1 trillion, or leave it empty.');
+    if (currentAmount === null) return setError('Progress must be a number up to 1 trillion.');
     const reachedTarget = targetAmount !== null && targetAmount > 0 && currentAmount >= targetAmount;
     onSave({
       ...goal,

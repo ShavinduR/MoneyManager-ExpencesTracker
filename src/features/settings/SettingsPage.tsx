@@ -63,7 +63,7 @@ const ProfileCard = () => {
   const save = (event: FormEvent): void => {
     event.preventDefault();
     const initialBalance = parseSignedMoney(form.initial || '0');
-    if (initialBalance === null) return toast.error('Starting balance must be a number');
+    if (initialBalance === null) return toast.error('Starting balance must be a number up to 1 trillion');
     if (form.email.trim() && !/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error('That email doesn’t look right');
     updateProfile({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), city: form.city.trim(), country: form.country.trim(), initialBalance });
     toast.success('Profile saved');
@@ -190,7 +190,9 @@ const DataCard = () => {
         onClose={() => setPending(null)}
         onConfirm={() => {
           if (pending?.kind !== 'import') return;
-          void replaceAll(pending.data).then(() => toast.success('Backup imported'));
+          void replaceAll(pending.data)
+            .then(() => toast.success('Backup imported'))
+            .catch(() => toast.error('Import failed. Your existing data was not changed.'));
         }}
       >
         {pending?.kind === 'import' && (
@@ -206,7 +208,11 @@ const DataCard = () => {
         description="6 months of realistic LKR data, 2 debts, 4 goals and bank accounts. Your current data will be replaced."
         confirmLabel="Load sample data"
         onClose={() => setPending(null)}
-        onConfirm={() => void loadDemo().then(() => toast.success('Sample data loaded'))}
+        onConfirm={() =>
+          void loadDemo()
+            .then(() => toast.success('Sample data loaded'))
+            .catch(() => toast.error('Couldn’t load sample data. Your existing data was not changed.'))
+        }
       />
       <ConfirmDialog
         open={pending?.kind === 'reset'}
@@ -215,7 +221,11 @@ const DataCard = () => {
         confirmLabel="Delete everything"
         tone="danger"
         onClose={() => setPending(null)}
-        onConfirm={() => void resetAll().then(() => toast.success('All data cleared'))}
+        onConfirm={() =>
+          void resetAll()
+            .then(() => toast.success('All data cleared'))
+            .catch(() => toast.error('Reset failed. Your data is unchanged.'))
+        }
       />
     </Card>
   );

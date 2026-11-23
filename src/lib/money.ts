@@ -5,6 +5,14 @@ export const cents = (value: number): Cents => Math.round(value) as Cents;
 
 export const ZERO: Cents = cents(0);
 
+/**
+ * Largest amount the app accepts: Rs. 1 trillion (10^14 cents). Far above any personal-finance value
+ * and far below Number.MAX_SAFE_INTEGER (~9 × 10^15), so integer-cent math stays exact everywhere.
+ */
+export const MAX_CENTS = 100_000_000_000_000;
+
+export const isWithinLimit = (value: number): boolean => Number.isSafeInteger(value) && Math.abs(value) <= MAX_CENTS;
+
 /** 1500.5 (major units) → 150050 cents */
 export const fromMajor = (major: number): Cents => cents(major * 100);
 
@@ -25,15 +33,15 @@ export const maxCents = (a: Cents, b: Cents): Cents => (a > b ? a : b);
 export const parseMoney = (input: string): Cents | null => {
   const normalized = input
     .toLowerCase()
-    .replace(/rs\.?|lkr|\/=|,/g, '')
+    .replace(/rs\.?|lkr|\/[=-]|,/g, '')
     .replace(/[$€£₹]/g, '')
     .trim();
   const match = /^(\d+(?:\.\d+)?)\s*(k|m|lakh|lakhs|lk)?$/.exec(normalized);
   if (!match?.[1]) return null;
   const base = Number.parseFloat(match[1]);
   if (!Number.isFinite(base)) return null;
-  const multiplier = unitMultiplier(match[2]);
-  return fromMajor(base * multiplier);
+  const value = fromMajor(base * unitMultiplier(match[2]));
+  return isWithinLimit(value) ? value : null;
 };
 
 /** Like parseMoney but accepts a leading "-" or "−" (bank balances, credit cards). */

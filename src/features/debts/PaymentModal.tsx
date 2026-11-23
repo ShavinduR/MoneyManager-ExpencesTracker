@@ -3,6 +3,7 @@ import type { DebtAccount, DebtEntry, ISODate } from '@/types/finance';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Field, Input } from '@/components/ui/Field';
+import { CheckCircle } from '@/components/ui/CheckCircle';
 import { isISODate, todayISO } from '@/lib/dates';
 import { parseMoney, toInputString } from '@/lib/money';
 import { newId } from '@/lib/factories';
@@ -14,6 +15,7 @@ export const PaymentModal = ({ open, onClose, debt, payment, onSave }: Props) =>
   const [date, setDate] = useState<ISODate>(todayISO());
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
+  const [cleared, setCleared] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,13 +23,14 @@ export const PaymentModal = ({ open, onClose, debt, payment, onSave }: Props) =>
     setDate(payment?.date ?? todayISO());
     setAmount(payment ? toInputString(payment.amount) : toInputString(debt.minimumPayment));
     setNotes(payment?.notes ?? '');
+    setCleared(payment?.cleared ?? true);
     setError(null);
   }, [open, payment, debt.minimumPayment]);
 
   const submit = (event: FormEvent): void => {
     event.preventDefault();
     const value = parseMoney(amount);
-    if (value === null || value <= 0) return setError('Enter the amount you paid.');
+    if (value === null || value <= 0) return setError('Enter the amount you paid (up to 1 trillion).');
     if (!isISODate(date)) return setError('Pick a valid date.');
     onSave({
       id: payment?.id ?? newId(),
@@ -38,7 +41,7 @@ export const PaymentModal = ({ open, onClose, debt, payment, onSave }: Props) =>
       amount: value,
       description: payment?.description ?? debt.creditor,
       notes: notes.trim(),
-      cleared: true,
+      cleared,
     });
     onClose();
   };
@@ -60,6 +63,11 @@ export const PaymentModal = ({ open, onClose, debt, payment, onSave }: Props) =>
         <Field label="Date">{(id) => <Input id={id} type="date" value={date} onChange={(e) => setDate(e.target.value)} />}</Field>
         <Field label="Amount paid">{(id) => <Input id={id} value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" className="tabular" />}</Field>
         <Field label="Notes" className="col-span-2">{(id) => <Input id={id} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Paid extra from bonus" maxLength={120} />}</Field>
+        <label className="col-span-2 flex cursor-pointer items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 text-sm dark:bg-ink-850">
+          <CheckCircle checked={cleared} onChange={() => setCleared((c) => !c)} label="Paid" />
+          <span>Paid</span>
+          <span className="ml-auto text-xs text-zinc-500">Planned payments don’t reduce the balance until paid</span>
+        </label>
         {error && <p className="col-span-2 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
         <button type="submit" className="hidden" aria-hidden tabIndex={-1} />
       </form>

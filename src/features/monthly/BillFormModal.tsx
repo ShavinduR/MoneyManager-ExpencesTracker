@@ -53,8 +53,8 @@ export const BillFormModal = ({ open, onClose, month, bill, onSave }: BillFormMo
     const amountDue = parseMoney(form.amountDue);
     const amountPaid = form.amountPaid.trim() ? parseMoney(form.amountPaid) : ZERO;
     if (!form.name.trim()) return setError('Give the bill a name.');
-    if (amountDue === null) return setError('Enter the amount due, e.g. 4200.');
-    if (amountPaid === null) return setError('Amount paid must be a number.');
+    if (amountDue === null) return setError('Enter the amount due (up to 1 trillion), e.g. 4200.');
+    if (amountPaid === null) return setError('Amount paid must be a number up to 1 trillion.');
     if (!isISODate(form.dueDate)) return setError('Pick a valid due date.');
     if (!isExpenseCategory(form.category)) return setError('Choose a category.');
     onSave({

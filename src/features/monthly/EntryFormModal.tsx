@@ -89,7 +89,7 @@ export const EntryFormModal = ({ open, onClose, kind, month, entry, onSave }: En
     event.preventDefault();
     const amount = parseMoney(form.amount);
     if (!form.description.trim() && !(kind === 'debt' && form.debtId)) return setError('Add a description.');
-    if (amount === null || amount <= 0) return setError('Enter an amount greater than zero, e.g. 1500 or 1.5k.');
+    if (amount === null || amount <= 0) return setError('Enter an amount greater than zero and up to 1 trillion, e.g. 1500 or 1.5k.');
     if (!isISODate(form.date)) return setError('Pick a valid date.');
     const creditor = debts.find((d) => d.id === form.debtId)?.creditor;
     const withDescription = !form.description.trim() && creditor ? { ...form, description: creditor } : form;
