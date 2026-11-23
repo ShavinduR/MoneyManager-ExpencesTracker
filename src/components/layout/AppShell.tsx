@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { getSidebarCollapsed, setSidebarCollapsed } from '@/lib/localPrefs';
 import { QuickEntryBar } from '@/components/quick-entry/QuickEntryBar';
@@ -13,10 +13,15 @@ import { CircleHelp, WifiOff } from 'lucide-react';
 import { IconButton } from '@/components/ui/Button';
 import { useUiStore } from '@/store/uiStore';
 import { useHashFocus } from '@/hooks/useHashFocus';
+import { OverlayBoundary } from './OverlayBoundary';
+import { resettableLazy } from './resettableLazy';
 
 // Guide and tour are opt-in, so they load only when opened (kept out of the entry chunk).
-const HelpModal = lazy(() => import('@/features/onboarding/HelpModal'));
-const GuidedTour = lazy(() => import('@/features/onboarding/GuidedTour'));
+const helpModal = resettableLazy(() => import('@/features/onboarding/HelpModal'));
+const guidedTour = resettableLazy(() => import('@/features/onboarding/GuidedTour'));
+// Device sync pulls in WebRTC (PeerJS) and QR libraries: only loaded when the sync dialog opens.
+const syncModal = resettableLazy(() => import('@/features/sync/SyncModal'));
+const OVERLAYS = [helpModal, guidedTour, syncModal] as const;
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 export const AppShell = () => {
@@ -24,7 +29,12 @@ export const AppShell = () => {
   const online = useOnlineStatus();
   const helpOpen = useUiStore((s) => s.helpOpen);
   const tourOpen = useUiStore((s) => s.tourOpen);
+  const syncOpen = useUiStore((s) => s.syncOpen);
   const openHelp = useUiStore((s) => s.openHelp);
+  const closeOverlays = useUiStore((s) => s.closeAll);
+  const HelpModal = helpModal.get();
+  const GuidedTour = guidedTour.get();
+  const SyncModal = syncModal.get();
   useHashFocus();
   const toggle = (): void => {
     setCollapsed((c) => {
@@ -66,10 +76,18 @@ export const AppShell = () => {
       <BottomNav />
       <Toaster />
       <UpdateNotice />
-      <Suspense fallback={null}>
-        {helpOpen && <HelpModal />}
-        {tourOpen && <GuidedTour />}
-      </Suspense>
+      <OverlayBoundary
+        onError={() => {
+          OVERLAYS.forEach((overlay) => overlay.reset());
+          closeOverlays();
+        }}
+      >
+        <Suspense fallback={null}>
+          {helpOpen && <HelpModal />}
+          {tourOpen && <GuidedTour />}
+          {syncOpen && <SyncModal />}
+        </Suspense>
+      </OverlayBoundary>
     </div>
   );
 };

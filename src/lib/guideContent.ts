@@ -48,7 +48,7 @@ export const GUIDE: Record<GuideLanguage, GuideContent> = {
     ],
     tip: 'Tip: on a keyboard, press / to jump straight to Quick-Entry.',
     tourButton: 'Take the 30s tour',
-    syncButton: 'Back up & sync',
+    syncButton: 'Sync devices',
     privacy: 'Everything stays on this device unless you export a backup or sync it yourself.',
   },
   si: {
@@ -80,7 +80,7 @@ export const GUIDE: Record<GuideLanguage, GuideContent> = {
     ],
     tip: 'ඉඟිය: යතුරුපුවරුවේ / ඔබා කෙලින්ම Quick-Entry වෙත යන්න.',
     tourButton: 'තත්පර 30 මඟපෙන්වීම',
-    syncButton: 'උපස්ථ සහ සමමුහුර්තකරණය',
+    syncButton: 'උපාංග සමමුහුර්ත කරන්න',
     privacy: 'ඔබ උපස්ථයක් අපනයනය කරන තුරු හෝ සමමුහුර්ත කරන තුරු, සියලු දත්ත මෙම උපාංගයේම පමණක් පවතී.',
   },
 };

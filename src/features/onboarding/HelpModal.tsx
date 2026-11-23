@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { CalendarCheck, CalendarDays, CalendarRange, Compass, ShieldCheck } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
@@ -14,7 +13,7 @@ const STEP_ICONS = [CalendarDays, CalendarRange, CalendarCheck] as const;
 const HelpModal = () => {
   const closeHelp = useUiStore((s) => s.closeHelp);
   const startTour = useUiStore((s) => s.startTour);
-  const navigate = useNavigate();
+  const openSync = useUiStore((s) => s.openSync);
   const [lang, setLang] = useState<GuideLanguage>(getGuideLanguage);
   const copy = GUIDE[lang];
 
@@ -33,10 +32,7 @@ const HelpModal = () => {
           <Button
             className="max-sm:w-full"
             icon={<ShieldCheck className="size-4" />}
-            onClick={() => {
-              closeHelp();
-              navigate('/settings#backup');
-            }}
+            onClick={openSync}
           >
             <span lang={lang}>{copy.syncButton}</span>
           </Button>

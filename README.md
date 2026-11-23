@@ -19,6 +19,7 @@ Built with React, TypeScript, Tailwind CSS and Recharts. Default currency is Sri
 - [Architecture](#architecture)
 - [Engineering decisions worth reading](#engineering-decisions-worth-reading)
 - [Data safety](#data-safety)
+- [Device sync (encrypted, peer to peer)](#device-sync-encrypted-peer-to-peer)
 - [Security by design](#security-by-design)
 - [Accessibility](#accessibility)
 - [Offline-first PWA](#offline-first-pwa)
@@ -98,8 +99,14 @@ Type a sentence and press Enter:
 - Totals for assets, money owed and net position.
 - **No password, login, security-hint or access-code fields**, by design.
 
+### Getting started, tour and guide
+- A **"Get set up in 4 steps"** checklist on the dashboard: starting balance, first entry, a monthly goal, and protecting or syncing your data. Each step ticks itself off from your real data; the card hides once you're done, when you dismiss it, or while you explore sample data. Its state is a device preference and never goes into backups.
+- An opt-in **30-second tour** (never started automatically) that spotlights quick-entry, the paid circles, carry-over and privacy. It runs in a modal `<dialog>`, so focus stays inside and Escape exits.
+- A bilingual **How it works** guide (English and සිංහල) behind the `?` button, with original copy.
+
 ### Profile and settings
 - Name, email, phone, city and country (all optional, all local), currency (LKR, USD, EUR, GBP, INR, AUD) and light / dark / system theme.
+- **Sync devices**: move everything to another phone or computer by QR code or a 6-digit code, encrypted end to end (see [Device sync](#device-sync-encrypted-peer-to-peer)).
 - JSON export, import with a preview of what's inside before anything is replaced, load sample data, and reset. All three destructive actions use a confirmation dialog and report failures.
 - An optional Gemini **model** setting, so the AI button keeps working when Google retires a model version.
 - Storage usage, a "Keep my data" request for persistent storage, an install button and online/offline status.
@@ -130,6 +137,7 @@ Type a sentence and press Enter:
 | Persistence | IndexedDB (`idb`) behind a repository interface; localStorage fallback |
 | Validation | zod at trust boundaries (import, stored data, LLM replies) |
 | PWA | `vite-plugin-pwa` (Workbox precache, installable, offline) |
+| Device sync | WebRTC DataChannels via PeerJS, Web Crypto (AES-GCM, PBKDF2), `qrcode`, native `BarcodeDetector` with a `jsQR` fallback |
 | Tests | Vitest (+ `fake-indexeddb` for the storage layer) |
 
 ## Architecture
@@ -189,6 +197,41 @@ A production audit found that one oversized amount could make the whole database
   - Bank text that looks like a credential.
   - Files over 5 MB, which are refused before they're read.
 
+## Device sync (encrypted, peer to peer)
+
+There are no accounts and no cloud copy. To move your planner to another device, open **Sync devices** (Settings → Data management, the More tab on mobile, or the How it works guide) on both:
+
+1. **Send from this device** shows a QR code and a code like `482-913`. It expires after 5 minutes and works once.
+2. **Receive here** on the other device scans the QR with the rear camera, or you type the code. If the camera is unavailable or blocked, it switches to code entry by itself.
+3. The sender is asked **"Device connected: send your data?"**. Nothing leaves the device until you tap **Send my data**.
+4. The receiver decrypts, validates and shows a **Sync preview** (incoming vs. this device). Nothing changes until you choose **Apply & Replace Local Data**; **Cancel** leaves everything as it was. Other open tabs are notified after the save.
+
+How it's built:
+
+| Concern | Design |
+|---|---|
+| Transport | WebRTC DataChannel straight between the two browsers. A PeerJS signalling server only introduces them; it sees two random-looking room ids, never the code, key or data. STUN for direct connections, plus PeerJS's public TURN relay as a fallback for networks that block them (common on mobile carrier-grade NAT). Relayed traffic is still encrypted by the app. |
+| Encryption | AES-GCM-256 via Web Crypto, a fresh IV per message, and additional data binding each ciphertext to its purpose. **QR:** a random 256-bit key travels inside the QR code. **6-digit code:** the key is derived with PBKDF2-SHA-256 (600,000 iterations) from the code plus a random per-session salt. |
+| Pairing | The room id is a SHA-256 hash of the code, so a wrong or expired code simply finds no device. The receiver must prove it holds the key (an encrypted challenge) before the sender is asked to approve. A wrong proof cancels the code, so it can't be guessed at again. Only one device can connect per code, and the sender leaves the signalling server once connected. |
+| Limits of a 6-digit code | 10⁶ possibilities can be brute-forced offline by someone who captured the encrypted traffic. That's why a code expires in 5 minutes, works once, needs the sender's approval, and why the QR (full 256-bit key) is the default. |
+| Validation | The decrypted payload goes through the **same pipeline as JSON import**: 5 MB cap, migrations, strict zod schema, `MAX_CENTS`, cross-record integrity and the bank-account secret guard. A tampered or invalid payload is rejected and the sender is told. |
+| Isolation | The payload is exactly a JSON backup of `FinanceData`. The Gemini key, theme mirror, sidebar state, onboarding flags and guide language live in `lib/localPrefs` and can't be included. On apply, the receiving device also keeps its own theme. |
+| Camera | Rear camera (`facingMode: environment`). Every track is stopped the moment a code is read, and on tab switch, error, page hide and dialog close. |
+| Failure handling | Offline ("Internet connection required to pair devices"), a 15-second connection timeout with Retry, wrong or expired codes, declined transfers, dropped connections and tampered payloads each have their own message. |
+| Bundle | The sync dialog, PeerJS and QR generation load only when Sync devices is opened (about 42 kB gzipped). `jsQR` (about 48 kB) loads only on browsers without `BarcodeDetector`. |
+
+**Self-hosting the signalling server.** The default is the free PeerJS cloud (`0.peerjs.com`). To run your own, start `npx peerjs --port 9000` and set:
+
+```bash
+VITE_PEERJS_HOST=peer.example.com
+VITE_PEERJS_PORT=443
+VITE_PEERJS_PATH=/
+VITE_PEERJS_SECURE=true
+VITE_PEERJS_KEY=peerjs
+```
+
+Then replace `https://0.peerjs.com wss://0.peerjs.com` in the `connect-src` of `vercel.json` with your host.
+
 ## Security by design
 
 The paper planner's bank page has fields for **Login Note, Security Hint and Access Code Hint**. This app **deliberately leaves them out**:
@@ -204,7 +247,8 @@ How that's enforced:
 | Input | Pasting a full card number keeps only the last 4 digits. Every bank text field (name, institution, branch, notes) is screened by `lib/security.ts`. It catches passwords and their short or obfuscated forms (`pw:`, `p@ssw0rd`, `passphrase`), PINs including `PIN1234` and `mpin`, OTP and CVV codes, security questions, usernames and logins, and card numbers with spaces or dashes. The account won't save, and ordinary notes like "Login-free wallet" or "Monthly bus pass" are still allowed. More than 50 test cases cover both sides. |
 | Import | Every record schema is `.strict()`, so a backup carrying `password`, `loginNote` or any unknown key is **rejected**. So are a full card number in `cardLast4` and bank text that looks like a credential. Covered by tests. |
 | API keys | The optional Gemini key is entered in Settings and kept in this browser only. It's **excluded from JSON backups** and never built into the bundle. `VITE_GEMINI_API_KEY` exists for local development only, because any `VITE_` variable ships to every visitor of a deployed site. |
-| Hosting | `vercel.json` sets a strict **Content-Security-Policy**. Scripts load only from this site, with no inline scripts (the theme bootstrap is `/theme-init.js`). Network requests can only go to this site and the Gemini API. Framing is disallowed (`frame-ancestors 'none'`). It also sets HSTS, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy` and a restrictive `Permissions-Policy`. The full app was tested with this policy enforced and produced zero violations. |
+| Device sync | End-to-end encrypted (AES-GCM), opt-in per transfer on both sides, and validated like an import. The Gemini key and device preferences are never part of the payload. |
+| Hosting | `vercel.json` sets a strict **Content-Security-Policy**. Scripts load only from this site, with no inline scripts (the theme bootstrap is `/theme-init.js`). Network requests can only go to this site, the Gemini API and the PeerJS signalling server (`https://0.peerjs.com`, `wss://0.peerjs.com`). Framing is disallowed (`frame-ancestors 'none'`). It also sets HSTS, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy` and a restrictive `Permissions-Policy` (camera for this site only, for QR scanning; no microphone or location). The full app was tested with this policy enforced and produced zero violations. |
 
 Use a password manager for credentials. This app is for numbers and intentions.
 
@@ -254,7 +298,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
 
 ## Testing
 
-192 unit tests cover the parts where a bug costs real money or trust:
+232 unit tests cover the parts where a bug costs real money or trust:
 
 - **Money:** cent math, parsing (`1,500`, `1,50,000`, `1.5k`, `2 lakh`, `850/-`, negatives), the Rs. 1 trillion limit, LKR formatting, compact axis labels.
 - **Month summary and carry-over:** totals, difference, balance forward, biggest and smallest area, skipped months, overrides, settled bills.
@@ -271,6 +315,12 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
   - Password fields, full card numbers, and float, negative or oversized amounts.
   - Month and date mismatches, duplicate IDs and orphan debt links.
   - Smuggled keys, credential text and files over 5 MB.
+- **Device sync:**
+  - AES-GCM round trips; wrong keys, wrong codes, wrong salts, flipped ciphertext or IV bits, and replaying a proof as a payload are all rejected.
+  - Full sender ↔ receiver sessions over an in-memory transport for both QR and code pairing: identical data arrives, nothing is sent before approval, declines, wrong codes, forged QR keys, tampering in transit, malformed messages, one device per code, 5-minute expiry, the 15-second timeout and teardown.
+  - Payloads with a password field, secret-looking notes, amounts over `MAX_CENTS`, foreign files and anything over 5 MB are rejected by the import pipeline.
+  - The payload never contains the Gemini key or any device preference.
+- **Onboarding:** each checklist step completes from real data, dismissal and sample data hide it, and its flags are device-only.
 - **Storage (`fake-indexeddb`):**
   - Save and reload, and `empty` vs. `loaded` vs. `unreadable` results.
   - **One corrupt record never wipes the database**, and a raw recovery copy is kept.
@@ -282,6 +332,8 @@ UI QA uses Playwright against the production build:
 - **Pages:** every route at 360, 390, 768, 1024 and 1440 px, in light and dark, with empty and sample data. It checks horizontal overflow, console errors, CSP violations, WCAG AA text contrast, chart tick overlap and unlabelled controls.
 - **Large values:** amounts like Rs. 12,500,000.55, plus long creditor and account names.
 - **Behaviour:** dialog focus trapping, keyboard shortcuts, offline add and edit, and two-tab editing.
+- **Onboarding and help:** the checklist completing step by step, the tour and the guide in English and Sinhala at 390 and 1440 px, light and dark.
+- **Sync:** two browsers pairing through a local PeerJS server with the CSP enforced: code and QR pairing (a fake camera shows the generated QR), the camera fallback, a wrong code, decline, preview and apply, camera tracks ending, and offline. Every dialog state is checked for overflow, contrast and focus trapping.
 
 ## Deploying to Vercel
 
@@ -337,6 +389,8 @@ src/
   types/finance.ts        domain types (stored + derived)
   lib/                    pure logic, colocated *.test.ts
     money.ts dates.ts categories.ts security.ts goals.ts accounts.ts
+    onboarding.ts guideContent.ts localPrefs.ts
+    sync/                 crypto (AES-GCM, PBKDF2) · protocol (zod messages, QR) · session (sender/receiver state machines)
     calculations/         monthSummary · carryOver · insights · upcomingBills
                           debt · payoffSimulator · yearSummary
     quickEntry/           parser · lexicon (EN/Singlish/Sinhala) · llmParser · targets
@@ -351,6 +405,7 @@ src/
     quick-entry/          QuickEntryBar, ConfirmationPill
     charts/               IncomeExpense, SavingsTrend, CategoryDonut, DebtBalance
   features/               dashboard · monthly · debts · goals · summary · accounts · settings
+                          onboarding (checklist, tour, guide) · sync (dialog, QR scanner, PeerJS transport)
 docs/PLAN.md              architecture plan and data model
 CLAUDE.md                 project conventions
 Sample image/             photos of the original paper planner
@@ -358,7 +413,7 @@ Sample image/             photos of the original paper planner
 
 ## Known limitations
 
-- **One device, no cloud sync.** Data lives in this browser; tabs on the same device stay in sync, but other devices don't. Use Export JSON to move data or keep a backup. Cloud sync is what the repository seam is for.
+- **Sync is a one-time copy, not continuous sync.** Sync devices replaces the receiving device's data with the sender's; it doesn't merge edits made on both. Both devices need to be online to pair, and the default signalling server is a free public service with no uptime guarantee (self-host it for anything important).
 - **Currency is display-only.** Changing from LKR to USD changes formatting; it doesn't convert amounts.
 - **The debt history balance** is the starting balance minus your *paid* payments. It doesn't model lender-posted interest month by month; the simulator handles interest projections.
 - **The Gemini key lives in the browser.** That's fine for a personal tool where users bring their own key. A multi-user product should put it behind a server-side proxy.

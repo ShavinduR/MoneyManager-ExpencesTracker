@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { CircleHelp, Compass, Database, Download, HardDrive, KeyRound, MonitorSmartphone, RotateCcw, ShieldCheck, Upload, User, WifiOff } from 'lucide-react';
+import { CircleHelp, Compass, Database, Download, HardDrive, KeyRound, MonitorSmartphone, RotateCcw, ShieldCheck, Smartphone, Upload, User, WifiOff } from 'lucide-react';
 import type { FinanceData, ThemePreference } from '@/types/finance';
 import { CURRENCY_CODES, THEME_PREFERENCES } from '@/types/finance';
 import { useFinanceStore } from '@/store/useFinanceStore';
@@ -185,6 +185,7 @@ const DataCard = () => {
   const loadDemo = useFinanceStore((s) => s.loadDemo);
   const resetAll = useFinanceStore((s) => s.resetAll);
   const replaceAll = useFinanceStore((s) => s.replaceAll);
+  const openSync = useUiStore((s) => s.openSync);
   const [pending, setPending] = useState<Pending>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const current = backupStats(data);
@@ -198,7 +199,7 @@ const DataCard = () => {
 
   return (
     <Card id="backup" ref={cardRef}>
-      <CardHeader title="Data management" subtitle="Back up, restore or explore with sample data" icon={<Database className="size-4" />} />
+      <CardHeader title="Data management" subtitle="Back up, sync to another device, restore or explore with sample data" icon={<Database className="size-4" />} />
       <div className="space-y-4 p-4 sm:p-5">
         <StatsGrid stats={current} />
         <div className="flex flex-wrap gap-2">
@@ -213,6 +214,7 @@ const DataCard = () => {
           >
             Export JSON
           </Button>
+          <Button icon={<Smartphone className="size-4" />} onClick={openSync} aria-haspopup="dialog">Sync devices</Button>
           <Button icon={<Upload className="size-4" />} onClick={() => fileRef.current?.click()}>Import JSON</Button>
           <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ''; }} />
           <Button icon={<Database className="size-4" />} onClick={() => setPending({ kind: 'demo' })}>Load sample data</Button>

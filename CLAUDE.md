@@ -57,11 +57,13 @@ npm run typecheck    # tsc only
 - All amounts are bounded by `MAX_CENTS` (Rs. 1 trillion) in `parseMoney`, the quick-add parser and the schema.
 - Writes go through the store's `persist()`: failures surface as `saveError` with a retry, and successful writes notify other tabs (`src/data/sync.ts`) so a stale tab can't overwrite newer data.
 - Storage falls back IndexedDB → localStorage → memory (`ResilientRepository`); nothing touches storage at import time.
-- Device-only preferences (theme mirror, sidebar state, Gemini key) live in `src/lib/localPrefs.ts` and are never part of `FinanceData` or backups.
+- Device-only preferences (theme mirror, sidebar state, Gemini key, onboarding flags, guide language) live in `src/lib/localPrefs.ts` and are never part of `FinanceData`, backups or sync payloads.
+- Device sync (`src/lib/sync/`, `src/features/sync/`): the payload is `buildSyncPayload` (a JSON backup) and the receiver validates it with `parseSyncPayload` (the import pipeline). Everything on the wire is AES-GCM encrypted and every incoming message is zod-parsed. Never apply received data without the Sync Preview confirmation, and never send without the sender's approval. Stop camera tracks on every exit path. Session teardown must stay idempotent (PeerJS fires close events synchronously). A different signalling host needs a matching `connect-src` in `vercel.json`.
 
 ## Workflow
 
 - Run `npm run build` and `npm run test` before every commit.
 - Debts and Year Summary are lazy-loaded (`React.lazy` in `App.tsx`). Keep Recharts imports inside `components/charts/` and those routes so it stays out of the entry chunk.
+- Help, tour and Sync are lazy overlays (`resettableLazy` in `AppShell.tsx`). PeerJS, `qrcode` and `jsqr` may only be imported from `features/sync/` so they stay out of the entry chunk.
 - UI changes: check 390px and 768px widths for horizontal overflow (grid children need `min-w-0`).
 - Branch: `claude/admiring-archimedes-2dv3pa`.
