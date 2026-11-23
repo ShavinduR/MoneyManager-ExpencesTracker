@@ -73,7 +73,7 @@ export const Modal = ({ open, onClose, title, description, children, footer }: M
           </div>
           <div className="overflow-y-auto px-5 py-4">{children}</div>
           {footer && (
-            <div className="flex items-center justify-end gap-2 border-t border-zinc-100 px-5 py-3 safe-bottom dark:border-ink-800">{footer}</div>
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-100 px-5 py-3 safe-bottom dark:border-ink-800">{footer}</div>
           )}
         </div>
       </div>

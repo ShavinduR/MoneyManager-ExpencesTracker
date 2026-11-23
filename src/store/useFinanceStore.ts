@@ -17,6 +17,7 @@ import { monthKeyOf } from '@/lib/dates';
 import { upsertEntry } from '@/lib/monthOps';
 import type { QuickEntryDraft } from '@/lib/quickEntry/parser';
 import { assertNever } from '@/lib/assertNever';
+import { useOnboardingStore } from './onboardingStore';
 
 /**
  * - `loading`: reading storage.
@@ -245,11 +246,14 @@ export const useFinanceStore = create<FinanceState>((set, get) => {
       const demo = createDemoData();
       // Keep the user's display preferences when exploring the demo.
       await get().replaceAll({ ...demo, profile: { ...demo.profile, theme: profile.theme } });
+      useOnboardingStore.getState().update({ sampleLoaded: true });
     },
 
     resetAll: async () => {
       await repository.clear();
       set({ data: emptyData(), hasData: false, loadIssues: [], saveError: null });
+      // A full reset means starting over: show the getting-started checklist again.
+      useOnboardingStore.getState().reset();
       sync?.notify();
     },
   };

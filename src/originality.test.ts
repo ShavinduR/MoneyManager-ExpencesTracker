@@ -5,7 +5,13 @@ import { describe, expect, it } from 'vitest';
  * must not reappear in the UI, sample data, HTML, public assets or docs.
  * Uses Vite's import.meta.glob (no Node APIs, so it type-checks with the app's tsconfig).
  */
-const BANNED: readonly RegExp[] = [/richer than (you|i) think/i];
+const BANNED: readonly RegExp[] = [
+  /richer than (you|i) think/i,
+  /first step toward(s)? financial freedom/i,
+  /how much wealth you already poss?ess?/i,
+  /financial management in one versatile book/i,
+  /right mindset and daily discipline/i,
+];
 
 const sources: Record<string, string> = {
   ...import.meta.glob('/src/**/*.{ts,tsx,css}', { query: '?raw', import: 'default', eager: true }),

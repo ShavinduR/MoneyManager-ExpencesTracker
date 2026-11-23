@@ -43,7 +43,7 @@ export const OpeningBalanceCard = ({ month, summary, previousMonth }: Props) => 
   };
 
   return (
-    <div className="flex flex-col justify-between gap-2 rounded-[var(--radius-card)] border border-zinc-200/80 bg-white p-4 sm:p-5 dark:border-ink-800 dark:bg-ink-900">
+    <div data-tour="carry-over" className="flex flex-col justify-between gap-2 rounded-[var(--radius-card)] border border-zinc-200/80 bg-white p-4 sm:p-5 dark:border-ink-800 dark:bg-ink-900">
       <div className="flex items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-xs font-medium text-muted">
           <ArrowRightLeft className="size-3.5" /> Starting balance

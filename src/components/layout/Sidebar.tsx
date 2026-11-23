@@ -28,6 +28,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => (
           key={to}
           to={to}
           end={to === '/'}
+          data-tour={to === '/settings' ? 'privacy' : undefined}
           title={label}
           className={({ isActive }) =>
             cn(

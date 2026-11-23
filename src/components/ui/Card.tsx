@@ -1,15 +1,17 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
-export const Card = ({ className, ...rest }: HTMLAttributes<HTMLDivElement>) => (
+export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...rest }, ref) => (
   <div
+    ref={ref}
     className={cn(
       'rounded-[var(--radius-card)] border border-zinc-200/80 bg-white dark:border-ink-800 dark:bg-ink-900',
       className,
     )}
     {...rest}
   />
-);
+));
+Card.displayName = 'Card';
 
 type CardHeaderProps = {
   title: ReactNode;

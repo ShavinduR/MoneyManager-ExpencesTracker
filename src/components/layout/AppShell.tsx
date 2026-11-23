@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { getSidebarCollapsed, setSidebarCollapsed } from '@/lib/localPrefs';
 import { QuickEntryBar } from '@/components/quick-entry/QuickEntryBar';
@@ -9,12 +9,23 @@ import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { ThemeToggle } from './ThemeToggle';
 import { LogoMark } from './Logo';
-import { WifiOff } from 'lucide-react';
+import { CircleHelp, WifiOff } from 'lucide-react';
+import { IconButton } from '@/components/ui/Button';
+import { useUiStore } from '@/store/uiStore';
+import { useHashFocus } from '@/hooks/useHashFocus';
+
+// Guide and tour are opt-in, so they load only when opened (kept out of the entry chunk).
+const HelpModal = lazy(() => import('@/features/onboarding/HelpModal'));
+const GuidedTour = lazy(() => import('@/features/onboarding/GuidedTour'));
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 export const AppShell = () => {
   const [collapsed, setCollapsed] = useState(getSidebarCollapsed);
   const online = useOnlineStatus();
+  const helpOpen = useUiStore((s) => s.helpOpen);
+  const tourOpen = useUiStore((s) => s.tourOpen);
+  const openHelp = useUiStore((s) => s.openHelp);
+  useHashFocus();
   const toggle = (): void => {
     setCollapsed((c) => {
       setSidebarCollapsed(!c);
@@ -40,6 +51,9 @@ export const AppShell = () => {
                   <span className="hidden sm:inline">Offline</span>
                 </span>
               )}
+              <IconButton label="How it works" onClick={openHelp} aria-haspopup="dialog">
+                <CircleHelp className="size-[18px]" />
+              </IconButton>
               <ThemeToggle />
             </div>
           </div>
@@ -52,6 +66,10 @@ export const AppShell = () => {
       <BottomNav />
       <Toaster />
       <UpdateNotice />
+      <Suspense fallback={null}>
+        {helpOpen && <HelpModal />}
+        {tourOpen && <GuidedTour />}
+      </Suspense>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { useFinanceStore } from '@/store/useFinanceStore';
 import { toast } from '@/components/ui/toast';
 import { useFormatMoney } from '@/components/ui/Money';
 import { ConfirmationPill } from './ConfirmationPill';
+import { isQuickEntryRequest, QUICK_ENTRY_EVENT } from './quickEntryEvents';
 
 const EXAMPLES = ['Petrol 1500 today', 'Salary 85000', 'ada lunch 850', 'electricity bill 4200', 'iye kema 1200', 'save 10000 emergency'];
 
@@ -57,6 +58,20 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
     return () => window.removeEventListener('keydown', onKey);
   }, [autoFocusShortcut]);
 
+  useEffect(() => {
+    const onRequest = (event: Event): void => {
+      if (!isQuickEntryRequest(event)) return;
+      if (event.detail.text) {
+        setText(event.detail.text);
+        setAiResult(null);
+        setOverride(null);
+      }
+      inputRef.current?.focus();
+    };
+    window.addEventListener(QUICK_ENTRY_EVENT, onRequest);
+    return () => window.removeEventListener(QUICK_ENTRY_EVENT, onRequest);
+  }, []);
+
   const reset = (): void => {
     setText('');
     setAiResult(null);
@@ -91,7 +106,7 @@ export const QuickEntryBar = ({ className, autoFocusShortcut = false }: QuickEnt
   const showPanel = text.trim().length > 0;
 
   return (
-    <div className={cn('relative w-full', className)}>
+    <div className={cn('relative w-full', className)} data-tour="quick-entry">
       <form onSubmit={onSubmit} role="search" aria-label="Quick add transaction">
         <div
           className={cn(

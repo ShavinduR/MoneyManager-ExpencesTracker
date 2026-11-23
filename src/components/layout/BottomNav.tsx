@@ -31,7 +31,7 @@ export const BottomNav = () => {
             )}
           </NavLink>
         ))}
-        <NavLink to="/more" className={() => itemClass(moreActive)}>
+        <NavLink to="/more" className={() => itemClass(moreActive)} data-tour="privacy">
           <span className={cn('flex h-7 w-12 items-center justify-center rounded-full', moreActive && 'bg-zinc-100 dark:bg-accent-500/15')}>
             <MoreHorizontal className="size-[19px]" />
           </span>

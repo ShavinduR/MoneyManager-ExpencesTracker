@@ -24,12 +24,14 @@ type EntrySectionProps = {
   emptyHint: string;
   entries: MonthlyEntry[];
   className?: string;
+  /** Anchor for the guided tour. */
+  tourId?: string;
 };
 
 const dotColor = (entry: MonthlyEntry): string =>
   entry.kind === 'income' ? '#10b981' : entry.kind === 'savings' ? '#0ea5e9' : isExpenseCategory(entry.category) ? CATEGORY_COLORS[entry.category] : '#94a3b8';
 
-export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, entries, className }: EntrySectionProps) => {
+export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, entries, className, tourId }: EntrySectionProps) => {
   const updateMonth = useFinanceStore((s) => s.updateMonth);
   const debts = useFinanceStore((s) => s.data.debts);
   const [editing, setEditing] = useState<MonthlyEntry | null>(null);
@@ -72,7 +74,7 @@ export const EntrySection = ({ kind, month, title, subtitle, icon, emptyHint, en
   };
 
   return (
-    <Card className={cn('flex flex-col', className)}>
+    <Card className={cn('flex flex-col', className)} data-tour={tourId}>
       <CardHeader
         title={title}
         subtitle={entries.length ? `${cleared} of ${entries.length} ${kind === 'income' ? 'received' : 'cleared'}` : subtitle}

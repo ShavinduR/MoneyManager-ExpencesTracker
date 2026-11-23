@@ -11,7 +11,7 @@ import { cn } from '@/lib/cn';
 import { useFinanceStore } from '@/store/useFinanceStore';
 
 /** Commits text on blur so we don't write to IndexedDB on every keystroke. */
-const GoalRow = ({ goal, index, month, removable }: { goal: MonthGoal; index: number; month: MonthKey; removable: boolean }) => {
+const GoalRow = ({ goal, index, month, removable, autofocusTarget }: { goal: MonthGoal; index: number; month: MonthKey; removable: boolean; autofocusTarget: boolean }) => {
   const updateMonth = useFinanceStore((s) => s.updateMonth);
   const [text, setText] = useState(goal.text);
   useEffect(() => setText(goal.text), [goal.text]);
@@ -33,6 +33,7 @@ const GoalRow = ({ goal, index, month, removable }: { goal: MonthGoal; index: nu
         onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
         placeholder={`Goal ${index + 1}`}
+        data-autofocus={autofocusTarget || undefined}
         aria-label={`Goal ${index + 1}`}
         maxLength={120}
         className={cn(
@@ -53,10 +54,11 @@ export const GoalsCard = ({ month, goals }: { month: MonthKey; goals: MonthGoal[
   const updateMonth = useFinanceStore((s) => s.updateMonth);
   const padded = goals.length >= MIN_MONTH_GOALS ? goals : [...goals, ...Array.from({ length: MIN_MONTH_GOALS - goals.length }, emptyGoal)];
   const filled = padded.filter((g) => g.text.trim());
+  const firstEmptyId = padded.find((g) => !g.text.trim())?.id;
   const done = filled.filter((g) => g.done).length;
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col" id="monthly-goals">
       <CardHeader
         title="This month’s goals"
         subtitle={filled.length ? `${done} of ${filled.length} complete` : 'Small, specific, doable'}
@@ -74,7 +76,7 @@ export const GoalsCard = ({ month, goals }: { month: MonthKey; goals: MonthGoal[
       )}
       <ul className="py-2">
         {padded.map((goal, index) => (
-          <GoalRow key={goal.id} goal={goal} index={index} month={month} removable={padded.length > MIN_MONTH_GOALS} />
+          <GoalRow key={goal.id} goal={goal} index={index} month={month} removable={padded.length > MIN_MONTH_GOALS} autofocusTarget={goal.id === firstEmptyId} />
         ))}
       </ul>
     </Card>

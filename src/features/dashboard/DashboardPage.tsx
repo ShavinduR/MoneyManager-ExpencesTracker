@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BellRing, CalendarDays, Database, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarDays, Compass, Database, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
 import { upcomingBills } from '@/lib/calculations/upcomingBills';
 import { todayISO } from '@/lib/dates';
 import { DueBadge } from '@/features/monthly/DueBadge';
@@ -16,6 +16,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from '@/components/ui/toast';
 import { SummaryStrip } from '@/features/monthly/SummaryStrip';
 import { ModuleTiles } from './ModuleTiles';
+import { GettingStarted } from '@/features/onboarding/GettingStarted';
+import { useUiStore } from '@/store/uiStore';
 import { cn } from '@/lib/cn';
 
 const greeting = (): string => {
@@ -25,6 +27,7 @@ const greeting = (): string => {
 
 const Welcome = () => {
   const loadDemo = useFinanceStore((s) => s.loadDemo);
+  const startTour = useUiStore((s) => s.startTour);
   return (
     <div className="animate-fade-up">
       <Card className="overflow-hidden">
@@ -50,6 +53,9 @@ const Welcome = () => {
             <Link to={`/monthly/${currentMonthKey()}`}>
               <Button icon={<CalendarDays className="size-4" />}>Start fresh this month</Button>
             </Link>
+            <Button variant="ghost" icon={<Compass className="size-4" />} onClick={startTour}>
+              Take a 30s tour
+            </Button>
           </div>
         </div>
         <div className="grid gap-px border-t border-zinc-100 bg-zinc-100 sm:grid-cols-3 dark:border-ink-800 dark:bg-ink-800">
@@ -66,6 +72,7 @@ const Welcome = () => {
           ))}
         </div>
       </Card>
+      <GettingStarted className="mt-4" />
     </div>
   );
 };
@@ -103,6 +110,7 @@ export const DashboardPage = () => {
         </Link>
       </div>
 
+      <GettingStarted />
       <SummaryStrip summary={summary} />
       <ModuleTiles />
 

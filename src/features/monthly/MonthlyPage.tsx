@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowDownLeft, CreditCard, PiggyBank, Receipt } from 'lucide-react';
 import type { EntryKind, MonthlyEntry } from '@/types/finance';
 import { currentMonthKey, formatMonthLong, isMonthKey } from '@/lib/dates';
@@ -14,7 +14,11 @@ import { OverviewCard } from './OverviewCard';
 import { ReflectionPanel } from './ReflectionPanel';
 import { SummaryStrip } from './SummaryStrip';
 
-export const MonthlyRedirect = () => <Navigate to={`/monthly/${currentMonthKey()}`} replace />;
+/** Keeps any #anchor (e.g. #monthly-goals from the getting-started checklist) through the redirect. */
+export const MonthlyRedirect = () => {
+  const { hash } = useLocation();
+  return <Navigate to={`/monthly/${currentMonthKey()}${hash}`} replace />;
+};
 
 export const MonthlyPage = () => {
   const { month = '' } = useParams();
@@ -50,7 +54,7 @@ const MonthlyWorkspace = ({ month }: { month: string }) => {
         <GoalsCard month={month} goals={record.goals} />
         <EntrySection kind="savings" month={month} title="Savings" subtitle="Pay yourself first" icon={<PiggyBank className="size-4" />} emptyHint="Money moved to savings is subtracted from your balance forward." entries={byKind.savings} />
         <EntrySection kind="debt" month={month} title="Debt payments" subtitle="Loans, leasing, credit cards" icon={<CreditCard className="size-4" />} emptyHint="Link a payment to a debt account to track your payoff progress." entries={byKind.debt} />
-        <EntrySection kind="fixed" month={month} title="Expenses & regular bills" subtitle="Rent, utilities, groceries, fuel…" icon={<Receipt className="size-4" />} emptyHint="Try “electricity bill 4200” or “ada lunch 850” in the quick-add bar." entries={byKind.fixed} className="lg:col-span-2" />
+        <EntrySection tourId="paid-circles" kind="fixed" month={month} title="Expenses & regular bills" subtitle="Rent, utilities, groceries, fuel…" icon={<Receipt className="size-4" />} emptyHint="Try “electricity bill 4200” or “ada lunch 850” in the quick-add bar." entries={byKind.fixed} className="lg:col-span-2" />
         <OtherBillsSection month={month} bills={record.otherBills} />
         <OverviewCard summary={summary} />
         <ReflectionPanel key={month} month={month} notes={record.notes} reflection={record.reflection} />

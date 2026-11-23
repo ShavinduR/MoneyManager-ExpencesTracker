@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Database, Download, HardDrive, KeyRound, MonitorSmartphone, RotateCcw, ShieldCheck, Upload, User, WifiOff } from 'lucide-react';
+import { CircleHelp, Compass, Database, Download, HardDrive, KeyRound, MonitorSmartphone, RotateCcw, ShieldCheck, Upload, User, WifiOff } from 'lucide-react';
 import type { FinanceData, ThemePreference } from '@/types/finance';
 import { CURRENCY_CODES, THEME_PREFERENCES } from '@/types/finance';
 import { useFinanceStore } from '@/store/useFinanceStore';
@@ -16,6 +16,8 @@ import { DEFAULT_GEMINI_MODEL, getGeminiKey, getGeminiModel, isValidModelId, set
 import { formatBytes, getStorageInfo, requestPersistentStorage, type StorageInfo } from '@/lib/deviceStorage';
 import { backupStats, downloadBackup, readBackupFile, type BackupStats } from '@/data/backup';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { useOnboardingStore } from '@/store/onboardingStore';
+import { useUiStore } from '@/store/uiStore';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 const isCurrency = (v: string): v is (typeof CURRENCY_CODES)[number] => CURRENCY_CODES.some((c) => c === v);
@@ -78,9 +80,11 @@ const ProfileCard = () => {
         <Field label="Phone">{(id) => <Input id={id} type="tel" value={form.phone} onChange={set('phone')} autoComplete="tel" />}</Field>
         <Field label="City">{(id) => <Input id={id} value={form.city} onChange={set('city')} autoComplete="address-level2" />}</Field>
         <Field label="Country">{(id) => <Input id={id} value={form.country} onChange={set('country')} autoComplete="country-name" />}</Field>
-        <Field label="Starting balance" hint="Opening balance of your first tracked month">
-          {(id) => <Input id={id} value={form.initial} onChange={set('initial')} inputMode="decimal" className="tabular" />}
-        </Field>
+        <div id="starting-balance">
+          <Field label="Starting balance" hint="Opening balance of your first tracked month">
+            {(id) => <Input id={id} value={form.initial} onChange={set('initial')} inputMode="decimal" className="tabular" />}
+          </Field>
+        </div>
         <div className="flex justify-end sm:col-span-2">
           <Button variant="primary" type="submit">Save profile</Button>
         </div>
@@ -159,6 +163,24 @@ const AiCard = () => {
 type Pending = { kind: 'import'; data: FinanceData; exportedAt: string | null } | { kind: 'demo' } | { kind: 'reset' } | null;
 
 const DataCard = () => {
+  const markProtected = useOnboardingStore((s) => s.update);
+  const cardRef = useRef<HTMLDivElement>(null);
+  // Seeing the backup & sync section (not just opening Settings) completes "Protect or sync your data".
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          markProtected({ protectVisited: true });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.6 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [markProtected]);
   const data = useFinanceStore((s) => s.data);
   const loadDemo = useFinanceStore((s) => s.loadDemo);
   const resetAll = useFinanceStore((s) => s.resetAll);
@@ -175,7 +197,7 @@ const DataCard = () => {
   };
 
   return (
-    <Card>
+    <Card id="backup" ref={cardRef}>
       <CardHeader title="Data management" subtitle="Back up, restore or explore with sample data" icon={<Database className="size-4" />} />
       <div className="space-y-4 p-4 sm:p-5">
         <StatsGrid stats={current} />
@@ -185,6 +207,7 @@ const DataCard = () => {
             icon={<Download className="size-4" />}
             onClick={() => {
               downloadBackup(data);
+              markProtected({ protectVisited: true });
               toast.success('Backup downloaded');
             }}
           >
@@ -305,7 +328,21 @@ const DeviceCard = () => {
   );
 };
 
-export const SettingsPage = () => (
+const HelpCard = () => {
+  const openHelp = useUiStore((s) => s.openHelp);
+  const startTour = useUiStore((s) => s.startTour);
+  return (
+    <Card>
+      <CardHeader title="Help & guide" subtitle="How the monthly rhythm works, in English and සිංහල" icon={<CircleHelp className="size-4" />} />
+      <div className="flex flex-wrap gap-2 p-4 sm:p-5">
+        <Button icon={<CircleHelp className="size-4" />} onClick={openHelp} aria-haspopup="dialog">How it works</Button>
+        <Button icon={<Compass className="size-4" />} onClick={startTour}>Take a 30s tour</Button>
+      </div>
+    </Card>
+  );
+};
+
+const SettingsLayout = () => (
   <div className="animate-fade-up">
     <PageHeader title="Profile & settings" subtitle="Everything is stored locally on this device." />
     <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
@@ -317,7 +354,10 @@ export const SettingsPage = () => (
       <div className="space-y-4">
         <DataCard />
         <DeviceCard />
+        <HelpCard />
       </div>
     </div>
   </div>
 );
+
+export const SettingsPage = SettingsLayout;
