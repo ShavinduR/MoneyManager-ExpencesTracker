@@ -46,7 +46,14 @@ npm run typecheck    # tsc only
 - Every list has an empty state with a clear next action.
 - Calm fintech look: generous whitespace, subtle borders over heavy shadows, 150–200ms transitions on specific properties (no `transition-all`).
 
+## Data safety
+
+- Stored data and imports go through `migrateToLatest` (`src/data/migrations.ts`) and then zod. When changing the schema, bump `SCHEMA_VERSION`, add a migration step and a test.
+- Device-only preferences (theme mirror, sidebar state, Gemini key) live in `src/lib/localPrefs.ts` and are never part of `FinanceData` or backups.
+
 ## Workflow
 
-- Work in phases (see `docs/PLAN.md`). Run `npm run build` and `npm run test` at the end of each phase.
+- Run `npm run build` and `npm run test` before every commit.
+- Debts and Year Summary are lazy-loaded (`React.lazy` in `App.tsx`). Keep Recharts imports inside `components/charts/` and those routes so it stays out of the entry chunk.
+- UI changes: check 390px and 768px widths for horizontal overflow (grid children need `min-w-0`).
 - Branch: `claude/admiring-archimedes-2dv3pa`.

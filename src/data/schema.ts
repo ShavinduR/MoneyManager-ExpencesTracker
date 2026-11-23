@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import type { BackupEnvelope, FinanceData } from '@/types/finance';
+import type { FinanceData } from '@/types/finance';
+import { migrateToLatest } from './migrations';
 import {
   ACCOUNT_TYPES,
   CURRENCY_CODES,
@@ -130,12 +131,6 @@ export const financeDataSchema = z.object({
   bankAccounts: z.array(bankAccount),
 });
 
-const backupSchema = z.object({
-  app: z.literal('mindset-finance-planner'),
-  exportedAt: z.string(),
-  data: financeDataSchema,
-});
-
 export type ParseOutcome<T> = { ok: true; value: T } | { ok: false; error: string };
 
 const describeError = (error: z.ZodError): string => {
@@ -148,7 +143,8 @@ export const parseFinanceData = (input: unknown): ParseOutcome<FinanceData> => {
   return result.success ? { ok: true, value: result.data } : { ok: false, error: describeError(result.error) };
 };
 
-export const parseBackup = (input: unknown): ParseOutcome<BackupEnvelope> => {
-  const result = backupSchema.safeParse(input);
-  return result.success ? { ok: true, value: result.data } : { ok: false, error: describeError(result.error) };
+/** Stored or imported document → migrate older schema versions → validate. */
+export const parseAndMigrate = (input: unknown): ParseOutcome<FinanceData> => {
+  const migrated = migrateToLatest(input);
+  return migrated.ok ? parseFinanceData(migrated.value) : { ok: false, error: migrated.error };
 };

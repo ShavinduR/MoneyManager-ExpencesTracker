@@ -1,6 +1,6 @@
 # Phase 0: Architecture & Data Model Proposal
 
-Status: **approved** (all four defaults in section 8 accepted). Phases 1–3 complete.
+Status: **approved** (all four defaults in section 8 accepted). All phases (0–4) complete. See README.md for the shipped architecture.
 
 The product: a local-first PWA that turns a paper 4-year finance planner into an app. One month is the unit of work: you open a month, log money in and out, and the app does the arithmetic, carries the balance into next month, and rolls everything up into yearly analytics.
 

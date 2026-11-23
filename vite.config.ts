@@ -12,6 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
+        id: '/',
         name: 'Mindset Finance Planner',
         short_name: 'Mindset',
         description: 'Local-first personal finance & mindset planner. Track months, debts, goals and reflections — offline.',
@@ -20,6 +21,13 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         scope: '/',
+        orientation: 'portrait-primary',
+        categories: ['finance', 'productivity', 'lifestyle'],
+        shortcuts: [
+          { name: 'This month', short_name: 'Monthly', url: '/monthly', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
+          { name: 'Debts & payoff simulator', short_name: 'Debts', url: '/debts', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
+          { name: 'Summary of the year', short_name: 'Summary', url: '/summary', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
+        ],
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -29,6 +37,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/index.html',
+        // Lazy route chunks (Debts, Year Summary, Recharts) are precached too, so they open offline.
+        cleanupOutdatedCaches: true,
       },
     }),
   ],

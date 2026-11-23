@@ -15,6 +15,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from '@/components/ui/toast';
 import { SummaryStrip } from '@/features/monthly/SummaryStrip';
+import { ModuleTiles } from './ModuleTiles';
 import { cn } from '@/lib/cn';
 
 const greeting = (): string => {
@@ -101,6 +102,7 @@ export const DashboardPage = () => {
       </div>
 
       <SummaryStrip summary={summary} />
+      <ModuleTiles />
 
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-3">

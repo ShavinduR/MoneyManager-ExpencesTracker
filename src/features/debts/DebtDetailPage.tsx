@@ -125,11 +125,11 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
         )}
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-5 [&>*]:min-w-0">
-        <div className="lg:col-span-3">
+      <div className="grid gap-4 xl:grid-cols-5 [&>*]:min-w-0">
+        <div className="xl:col-span-3">
           <PayoffSimulator debt={debt} remaining={progress.remaining} />
         </div>
-        <Card className="lg:col-span-2">
+        <Card className="xl:col-span-2">
           <CardHeader
             title="Payment history"
             subtitle={`${progress.paymentCount} payment${progress.paymentCount === 1 ? '' : 's'} · from your monthly tracker`}
@@ -139,7 +139,8 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
           {history.length === 0 ? (
             <EmptyState compact icon={<History className="size-4" />} title="No payments yet" description="Log one here, or add a Debt Payment linked to this debt on the Monthly page." />
           ) : (
-            <table className="mt-3 w-full text-sm">
+            <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-y border-zinc-100 text-left text-[11px] uppercase tracking-wider text-zinc-400 dark:border-ink-800">
                   <th className="py-2 pl-4 font-medium sm:pl-5">Date</th>
@@ -172,6 +173,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </Card>
       </div>

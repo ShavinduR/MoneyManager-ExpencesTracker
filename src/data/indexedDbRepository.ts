@@ -2,7 +2,7 @@ import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { BankAccount, DebtAccount, FinanceData, MonthKey, MonthRecord, Profile, YearPlan } from '@/types/finance';
 import { SCHEMA_VERSION } from '@/types/finance';
 import type { FinanceRepository } from './repository';
-import { parseFinanceData } from './schema';
+import { parseAndMigrate } from './schema';
 
 type KvValue =
   | { key: 'profile'; value: Profile }
@@ -41,15 +41,16 @@ export class IndexedDbRepository implements FinanceRepository {
       db.getAll('yearPlans'),
     ]);
     if (!profile || profile.key !== 'profile') return null;
+    const version = await db.get('kv', 'schemaVersion');
     const candidate = {
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: version?.key === 'schemaVersion' ? version.value : SCHEMA_VERSION,
       profile: profile.value,
       months: Object.fromEntries(months.map((m) => [m.month, m])),
       debts: debts?.key === 'debts' ? debts.value : [],
       yearPlans: Object.fromEntries(yearPlans.map((p) => [String(p.year), p])),
       bankAccounts: bankAccounts?.key === 'bankAccounts' ? bankAccounts.value : [],
     };
-    const parsed = parseFinanceData(candidate);
+    const parsed = parseAndMigrate(candidate);
     if (!parsed.ok) {
       console.error('Stored data failed validation:', parsed.error);
       return null;

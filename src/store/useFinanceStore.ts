@@ -40,6 +40,10 @@ type FinanceState = {
 
 const repository: FinanceRepository = createRepository();
 
+/** Whether the user has created anything yet: drives the welcome screen (a stored empty profile doesn't count). */
+export const hasContent = (data: FinanceData): boolean =>
+  Object.keys(data.months).length > 0 || data.debts.length > 0 || data.bankAccounts.length > 0 || Object.keys(data.yearPlans).length > 0;
+
 /** Optimistic writes: update memory first, persist in the background, surface failures in the console. */
 const persist = (task: Promise<void>): void => {
   task.catch((error: unknown) => console.error('Failed to save', error));
@@ -71,7 +75,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     try {
       const stored = await repository.load();
       if (stored) {
-        set({ data: stored, hasData: true, status: 'ready' });
+        set({ data: stored, hasData: hasContent(stored), status: 'ready' });
       } else {
         const fresh = emptyData();
         await repository.replaceAll(fresh);
@@ -139,7 +143,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
   replaceAll: async (data) => {
     await repository.replaceAll(data);
-    set({ data, hasData: Object.keys(data.months).length > 0 || data.debts.length > 0 });
+    set({ data, hasData: hasContent(data) });
   },
 
   loadDemo: async () => {

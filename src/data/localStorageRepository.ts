@@ -1,6 +1,6 @@
 import type { BankAccount, DebtAccount, FinanceData, MonthKey, MonthRecord, Profile, YearPlan } from '@/types/finance';
 import type { FinanceRepository } from './repository';
-import { parseFinanceData } from './schema';
+import { parseAndMigrate } from './schema';
 
 const KEY = 'mfp-data';
 
@@ -12,7 +12,7 @@ export class LocalStorageRepository implements FinanceRepository {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     try {
-      const parsed = parseFinanceData(JSON.parse(raw));
+      const parsed = parseAndMigrate(JSON.parse(raw));
       this.cache = parsed.ok ? parsed.value : null;
     } catch {
       this.cache = null;
