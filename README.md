@@ -6,8 +6,6 @@ Built with React, TypeScript, Tailwind CSS and Recharts. Default currency is Sri
 
 ![Dashboard](docs/screenshots/dashboard.webp)
 
-> **Try it in 30 seconds:** open the app and press **Load sample data**. You get six months of realistic LKR data, two debts, four yearly goals, bank accounts and monthly reflections, so every chart and calculation has something to show.
-
 ---
 
 ## Contents
@@ -100,14 +98,14 @@ Type a sentence and press Enter:
 - **No password, login, security-hint or access-code fields**, by design.
 
 ### Getting started, tour and guide
-- A **"Get set up in 4 steps"** checklist on the dashboard: starting balance, first entry, a monthly goal, and protecting or syncing your data. Each step ticks itself off from your real data; the card hides once you're done, when you dismiss it, or while you explore sample data. Its state is a device preference and never goes into backups.
+- A **"Get set up in 4 steps"** checklist on the dashboard: starting balance, first entry, a monthly goal, and protecting or syncing your data. Each step ticks itself off from your real data; the card hides once you're done or when you dismiss it. Its state is a device preference and never goes into backups.
 - An opt-in **30-second tour** (never started automatically) that spotlights quick-entry, the paid circles, carry-over and privacy. It runs in a modal `<dialog>`, so focus stays inside and Escape exits.
 - A bilingual **How it works** guide (English and සිංහල) behind the `?` button, with original copy.
 
 ### Profile and settings
 - Name, email, phone, city and country (all optional, all local), currency (LKR, USD, EUR, GBP, INR, AUD) and light / dark / system theme.
 - **Sync devices**: move everything to another phone or computer by QR code or a 6-digit code, encrypted end to end (see [Device sync](#device-sync-encrypted-peer-to-peer)).
-- JSON export, import with a preview of what's inside before anything is replaced, load sample data, and reset. All three destructive actions use a confirmation dialog and report failures.
+- JSON export, import with a preview of what's inside before anything is replaced, and reset. Both destructive actions use a confirmation dialog and report failures.
 - An optional Gemini **model** setting, so the AI button keeps working when Google retires a model version.
 - Storage usage, a "Keep my data" request for persistent storage, an install button and online/offline status.
 
@@ -320,7 +318,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
   - Full sender ↔ receiver sessions over an in-memory transport for both QR and code pairing: identical data arrives, nothing is sent before approval, declines, wrong codes, forged QR keys, tampering in transit, malformed messages, one device per code, 5-minute expiry, the 15-second timeout and teardown.
   - Payloads with a password field, secret-looking notes, amounts over `MAX_CENTS`, foreign files and anything over 5 MB are rejected by the import pipeline.
   - The payload never contains the Gemini key or any device preference.
-- **Onboarding:** each checklist step completes from real data, dismissal and sample data hide it, and its flags are device-only.
+- **Onboarding:** each checklist step completes from real data, dismissal hides it, and its flags are device-only.
 - **Storage (`fake-indexeddb`):**
   - Save and reload, and `empty` vs. `loaded` vs. `unreadable` results.
   - **One corrupt record never wipes the database**, and a raw recovery copy is kept.
@@ -329,7 +327,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
   - Store hydration, and save errors that can be retried.
 
 UI QA uses Playwright against the production build:
-- **Pages:** every route at 360, 390, 768, 1024 and 1440 px, in light and dark, with empty and sample data. It checks horizontal overflow, console errors, CSP violations, WCAG AA text contrast, chart tick overlap and unlabelled controls.
+- **Pages:** every route at 360, 390, 768, 1024 and 1440 px, in light and dark, with empty and filled data. It checks horizontal overflow, console errors, CSP violations, WCAG AA text contrast, chart tick overlap and unlabelled controls.
 - **Large values:** amounts like Rs. 12,500,000.55, plus long creditor and account names.
 - **Behaviour:** dialog focus trapping, keyboard shortcuts, offline add and edit, and two-tab editing.
 - **Onboarding and help:** the checklist completing step by step, the tour and the guide in English and Sinhala at 390 and 1440 px, light and dark.
@@ -394,7 +392,7 @@ src/
     calculations/         monthSummary · carryOver · insights · upcomingBills
                           debt · payoffSimulator · yearSummary
     quickEntry/           parser · lexicon (EN/Singlish/Sinhala) · llmParser · targets
-    demoData.ts factories.ts monthOps.ts
+    demoData.ts (test fixture) factories.ts monthOps.ts
   data/                   repository interface; IndexedDB, localStorage and memory
                           adapters with automatic fallback; record-by-record salvage;
                           zod schema + import integrity; migrations; backups; cross-tab sync

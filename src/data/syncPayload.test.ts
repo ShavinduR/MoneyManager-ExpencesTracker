@@ -16,7 +16,7 @@ describe('sync payload isolation', () => {
     const secretKey = 'AIzaSy-TEST-SECRET-KEY-1234567890';
     setGeminiKey(secretKey);
     setGeminiModel('gemini-test-model');
-    setOnboardingFlags({ dismissed: true, protectVisited: true, sampleLoaded: false });
+    setOnboardingFlags({ dismissed: true, protectVisited: true });
     setGuideLanguage('si');
     setSidebarCollapsed(true);
     mirrorTheme('dark');

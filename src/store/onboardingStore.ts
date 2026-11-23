@@ -3,7 +3,7 @@ import type { OnboardingFlags } from '@/lib/onboarding';
 import { clearOnboardingFlags, getOnboardingFlags, setOnboardingFlags } from '@/lib/localPrefs';
 import { DEFAULT_ONBOARDING_FLAGS } from '@/lib/onboarding';
 
-const FLAG_KEYS = ['dismissed', 'protectVisited', 'sampleLoaded'] as const satisfies readonly (keyof OnboardingFlags)[];
+const FLAG_KEYS = ['dismissed', 'protectVisited'] as const satisfies readonly (keyof OnboardingFlags)[];
 
 type OnboardingState = {
   flags: OnboardingFlags;

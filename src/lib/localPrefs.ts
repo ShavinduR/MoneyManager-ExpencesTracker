@@ -59,7 +59,7 @@ export const getOnboardingFlags = (): OnboardingFlags => {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return { ...DEFAULT_ONBOARDING_FLAGS };
     const flag = (key: keyof OnboardingFlags): boolean => key in parsed && Reflect.get(parsed, key) === true;
-    return { dismissed: flag('dismissed'), protectVisited: flag('protectVisited'), sampleLoaded: flag('sampleLoaded') };
+    return { dismissed: flag('dismissed'), protectVisited: flag('protectVisited') };
   } catch {
     return { ...DEFAULT_ONBOARDING_FLAGS };
   }

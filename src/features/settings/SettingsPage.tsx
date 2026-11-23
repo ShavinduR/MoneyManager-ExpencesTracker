@@ -160,7 +160,7 @@ const AiCard = () => {
   );
 };
 
-type Pending = { kind: 'import'; data: FinanceData; exportedAt: string | null } | { kind: 'demo' } | { kind: 'reset' } | null;
+type Pending = { kind: 'import'; data: FinanceData; exportedAt: string | null } | { kind: 'reset' } | null;
 
 const DataCard = () => {
   const markProtected = useOnboardingStore((s) => s.update);
@@ -182,7 +182,6 @@ const DataCard = () => {
     return () => observer.disconnect();
   }, [markProtected]);
   const data = useFinanceStore((s) => s.data);
-  const loadDemo = useFinanceStore((s) => s.loadDemo);
   const resetAll = useFinanceStore((s) => s.resetAll);
   const replaceAll = useFinanceStore((s) => s.replaceAll);
   const openSync = useUiStore((s) => s.openSync);
@@ -199,7 +198,7 @@ const DataCard = () => {
 
   return (
     <Card id="backup" ref={cardRef}>
-      <CardHeader title="Data management" subtitle="Back up, sync to another device, restore or explore with sample data" icon={<Database className="size-4" />} />
+      <CardHeader title="Data management" subtitle="Back up, sync to another device or restore" icon={<Database className="size-4" />} />
       <div className="space-y-4 p-4 sm:p-5">
         <StatsGrid stats={current} />
         <div className="flex flex-wrap gap-2">
@@ -217,7 +216,6 @@ const DataCard = () => {
           <Button icon={<Smartphone className="size-4" />} onClick={openSync} aria-haspopup="dialog">Sync devices</Button>
           <Button icon={<Upload className="size-4" />} onClick={() => fileRef.current?.click()}>Import JSON</Button>
           <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ''; }} />
-          <Button icon={<Database className="size-4" />} onClick={() => setPending({ kind: 'demo' })}>Load sample data</Button>
           <Button variant="danger" icon={<RotateCcw className="size-4" />} onClick={() => setPending({ kind: 'reset' })} className="sm:ml-auto">Reset data</Button>
         </div>
         <p className="flex gap-2 text-xs text-muted">
@@ -246,18 +244,6 @@ const DataCard = () => {
           </div>
         )}
       </ConfirmDialog>
-      <ConfirmDialog
-        open={pending?.kind === 'demo'}
-        title="Load sample data?"
-        description="6 months of realistic LKR data, 2 debts, 4 goals and bank accounts. Your current data will be replaced."
-        confirmLabel="Load sample data"
-        onClose={() => setPending(null)}
-        onConfirm={() =>
-          void loadDemo()
-            .then(() => toast.success('Sample data loaded'))
-            .catch(() => toast.error('Couldn’t load sample data. Your existing data was not changed.'))
-        }
-      />
       <ConfirmDialog
         open={pending?.kind === 'reset'}
         title="Delete all data on this device?"

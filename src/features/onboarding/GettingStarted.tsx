@@ -25,7 +25,7 @@ const EXAMPLES = ['ada lunch 850', 'Petrol 1500'] as const;
 
 /**
  * Dismissible "Getting started" card. Steps tick themselves off from live data; the card hides
- * itself once everything is done, when dismissed, or while the user explores sample data.
+ * itself once everything is done or when dismissed.
  */
 export const GettingStarted = ({ className }: { className?: string }) => {
   const data = useFinanceStore((s) => s.data);

@@ -150,7 +150,7 @@ const buildMonth = (month: MonthKey, index: number, rng: Rng, today: ISODate): M
   };
 };
 
-/** 6 months of realistic LKR data ending in the current month, 2 debts, 4 goals, 3 bank accounts. */
+/** Test fixture: 6 months of realistic LKR data ending in the current month, 2 debts, 4 goals, bank accounts. Not shipped in the app. */
 export const createDemoData = (now: Date = new Date()): FinanceData => {
   const rng = mulberry32(20261122);
   const today = todayISO();

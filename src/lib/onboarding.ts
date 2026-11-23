@@ -12,11 +12,9 @@ export type OnboardingFlags = {
   dismissed: boolean;
   /** Visited Settings → backup/sync, or exported a backup. */
   protectVisited: boolean;
-  /** Sample data was loaded: the user is exploring, not setting up. */
-  sampleLoaded: boolean;
 };
 
-export const DEFAULT_ONBOARDING_FLAGS: OnboardingFlags = { dismissed: false, protectVisited: false, sampleLoaded: false };
+export const DEFAULT_ONBOARDING_FLAGS: OnboardingFlags = { dismissed: false, protectVisited: false };
 
 export type OnboardingStep = { id: OnboardingStepId; done: boolean };
 
@@ -38,8 +36,8 @@ export const isStepDone = (id: OnboardingStepId, data: FinanceData, flags: Onboa
 export const onboardingSteps = (data: FinanceData, flags: OnboardingFlags): OnboardingStep[] =>
   ONBOARDING_STEPS.map((id) => ({ id, done: isStepDone(id, data, flags) }));
 
-/** Shown only to people setting up for real: hidden once done, dismissed, or while exploring sample data. */
+/** Hidden once every step is done or when dismissed. */
 export const shouldShowChecklist = (steps: readonly OnboardingStep[], flags: OnboardingFlags): boolean =>
-  !flags.dismissed && !flags.sampleLoaded && steps.some((s) => !s.done);
+  !flags.dismissed && steps.some((s) => !s.done);
 
 export const completedCount = (steps: readonly OnboardingStep[]): number => steps.filter((s) => s.done).length;

@@ -41,14 +41,13 @@ describe('onboarding checklist auto-completion', () => {
     expect(done(emptyData(), { ...flags, protectVisited: true }).protect).toBe(true);
   });
 
-  it('hides when all steps are done, when dismissed, or while exploring sample data', () => {
+  it('hides when all steps are done or when dismissed', () => {
     const demo = createDemoData(new Date('2026-11-22T10:00:00'));
     const allDone = onboardingSteps(demo, { ...flags, protectVisited: true });
     expect(completedCount(allDone)).toBe(4);
     expect(shouldShowChecklist(allDone, flags)).toBe(false);
     const fresh = onboardingSteps(emptyData(), flags);
     expect(shouldShowChecklist(fresh, { ...flags, dismissed: true })).toBe(false);
-    expect(shouldShowChecklist(fresh, { ...flags, sampleLoaded: true })).toBe(false);
   });
 });
 
@@ -64,8 +63,8 @@ describe('onboarding flags storage (device-only)', () => {
     const ls = memoryStorage();
     vi.stubGlobal('localStorage', ls);
     expect(getOnboardingFlags()).toEqual(flags);
-    setOnboardingFlags({ dismissed: true, protectVisited: false, sampleLoaded: true });
-    expect(getOnboardingFlags()).toEqual({ dismissed: true, protectVisited: false, sampleLoaded: true });
+    setOnboardingFlags({ dismissed: true, protectVisited: false });
+    expect(getOnboardingFlags()).toEqual({ dismissed: true, protectVisited: false });
     ls.setItem('mfp-onboarding', '{not json');
     expect(getOnboardingFlags()).toEqual(flags);
     ls.setItem('mfp-onboarding', JSON.stringify({ dismissed: 'yes', protectVisited: 1 }));

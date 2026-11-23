@@ -12,7 +12,6 @@ import type {
 import { createRepository, type LoadResult, type StorageMode } from '@/data';
 import { startCrossTabSync, type SyncHandle } from '@/data/sync';
 import { emptyData, emptyMonth, emptyYearPlan, newId } from '@/lib/factories';
-import { createDemoData } from '@/lib/demoData';
 import { monthKeyOf } from '@/lib/dates';
 import { upsertEntry } from '@/lib/monthOps';
 import type { QuickEntryDraft } from '@/lib/quickEntry/parser';
@@ -53,7 +52,6 @@ type FinanceState = {
   updateYearPlan: (year: number, updater: (plan: YearPlan) => YearPlan) => void;
   /** These three throw on failure so the caller can tell the user. */
   replaceAll: (data: FinanceData) => Promise<void>;
-  loadDemo: () => Promise<void>;
   resetAll: () => Promise<void>;
 };
 
@@ -239,14 +237,6 @@ export const useFinanceStore = create<FinanceState>((set, get) => {
       await repository.replaceAll(data);
       set({ data, hasData: hasContent(data), loadIssues: [], saveError: null });
       sync?.notify();
-    },
-
-    loadDemo: async () => {
-      const { profile } = get().data;
-      const demo = createDemoData();
-      // Keep the user's display preferences when exploring the demo.
-      await get().replaceAll({ ...demo, profile: { ...demo.profile, theme: profile.theme } });
-      useOnboardingStore.getState().update({ sampleLoaded: true });
     },
 
     resetAll: async () => {

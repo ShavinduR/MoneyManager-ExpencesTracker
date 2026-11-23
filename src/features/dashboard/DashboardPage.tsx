@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BellRing, CalendarDays, Compass, Database, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarDays, Compass, Flag, Keyboard, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
 import { upcomingBills } from '@/lib/calculations/upcomingBills';
 import { todayISO } from '@/lib/dates';
 import { DueBadge } from '@/features/monthly/DueBadge';
@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/Button';
 import { Money } from '@/components/ui/Money';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { toast } from '@/components/ui/toast';
 import { SummaryStrip } from '@/features/monthly/SummaryStrip';
 import { ModuleTiles } from './ModuleTiles';
 import { GettingStarted } from '@/features/onboarding/GettingStarted';
@@ -26,7 +25,6 @@ const greeting = (): string => {
 };
 
 const Welcome = () => {
-  const loadDemo = useFinanceStore((s) => s.loadDemo);
   const startTour = useUiStore((s) => s.startTour);
   return (
     <div className="animate-fade-up">
@@ -39,19 +37,10 @@ const Welcome = () => {
             Track income, savings, debt and bills month by month. Totals, carry-over balances and yearly summaries calculate themselves. Your data stays on this device and works offline.
           </p>
           <div className="mt-7 flex flex-wrap gap-2">
-            <Button
-              variant="primary"
-              icon={<Database className="size-4" />}
-              onClick={() => {
-                void loadDemo()
-                  .then(() => toast.success('Sample data loaded: 6 months, 2 debts, 4 goals'))
-                  .catch(() => toast.error('Couldn’t save sample data on this device.'));
-              }}
-            >
-              Load sample data
-            </Button>
             <Link to={`/monthly/${currentMonthKey()}`}>
-              <Button icon={<CalendarDays className="size-4" />}>Start fresh this month</Button>
+              <Button variant="primary" icon={<CalendarDays className="size-4" />}>
+                Start this month
+              </Button>
             </Link>
             <Button variant="ghost" icon={<Compass className="size-4" />} onClick={startTour}>
               Take a 30s tour

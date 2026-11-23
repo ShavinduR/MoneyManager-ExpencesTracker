@@ -55,7 +55,7 @@ src/
       parser.ts               # deterministic regex + keyword parser
       lexicon.ts              # EN + Sinhala/Singlish keyword → category/type map
       llmParser.ts            # optional Gemini hook, zod-validated output
-    demoData.ts               # 6 months of realistic LKR data
+    demoData.ts               # test fixture: 6 months of realistic LKR data (not in the app)
   data/
     repository.ts             # FinanceRepository interface
     indexedDbRepository.ts    # default implementation
