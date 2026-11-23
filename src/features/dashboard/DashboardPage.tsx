@@ -30,7 +30,7 @@ const Welcome = () => {
       <Card className="overflow-hidden">
         <div className="relative px-6 py-10 sm:px-10 sm:py-14">
           <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-accent-500/10 blur-3xl" />
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-700 dark:text-accent-400">You are richer than you think</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-700 dark:text-accent-400">Clarity over your money, one month at a time.</p>
           <h1 className="mt-3 max-w-xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Your 4-year finance planner, now automatic.</h1>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
             Track income, savings, debt and bills month by month. Totals, carry-over balances and yearly summaries calculate themselves. Your data stays on this device and works offline.

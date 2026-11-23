@@ -35,7 +35,7 @@ Built with React, TypeScript, Tailwind CSS and Recharts. Default currency is Sri
 
 The starting point was a printed planner (photos in [`Sample image/`](Sample%20image/)). Each month it has tables for income, savings, debt and bills, an "Other bills" page, a monthly overview with a "This month taught me…" line, debt tracker pages, eight yearly goals and a year-end summary. It's a good system, but every total, every carry-over and every yearly figure has to be worked out by hand.
 
-This app keeps the structure and the mindset prompts and automates the math. It also redesigns the parts that shouldn't be copied, most notably the bank page's "login note" and "security hint" fields (see [Security by design](#security-by-design)).
+This app keeps the structure and the mindset prompts and automates the math. All interface copy, including the tagline *“Clarity over your money, one month at a time.”*, is original; a test (`src/originality.test.ts`) fails the build if the reference planner's slogan reappears. It also redesigns the parts that shouldn't be copied, most notably the bank page's "login note" and "security hint" fields (see [Security by design](#security-by-design)).
 
 ## Features
 
@@ -254,7 +254,7 @@ In a deployed build, users paste their own key in **Settings → AI quick-entry*
 
 ## Testing
 
-190 unit tests cover the parts where a bug costs real money or trust:
+192 unit tests cover the parts where a bug costs real money or trust:
 
 - **Money:** cent math, parsing (`1,500`, `1,50,000`, `1.5k`, `2 lakh`, `850/-`, negatives), the Rs. 1 trillion limit, LKR formatting, compact axis labels.
 - **Month summary and carry-over:** totals, difference, balance forward, biggest and smallest area, skipped months, overrides, settled bills.
