@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useFinanceStore } from '@/store/useFinanceStore';
@@ -9,7 +9,20 @@ import { MonthlyPage, MonthlyRedirect } from '@/features/monthly/MonthlyPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MorePage } from '@/features/settings/MorePage';
 import { BankAccountsPage } from '@/features/accounts/BankAccountsPage';
-import { ComingSoon } from '@/features/placeholder/ComingSoon';
+import { YearlyGoalsPage } from '@/features/goals/YearlyGoalsPage';
+
+// Chart-heavy routes are split out so Recharts is not part of the initial bundle.
+const DebtsPage = lazy(() => import('@/features/debts/DebtsPage'));
+const DebtDetailPage = lazy(() => import('@/features/debts/DebtDetailPage'));
+const YearSummaryPage = lazy(() => import('@/features/summary/YearSummaryPage'));
+
+const RouteFallback = () => (
+  <div className="flex min-h-[50vh] items-center justify-center text-zinc-400">
+    <Loader2 className="size-5 animate-spin" aria-label="Loading" />
+  </div>
+);
+
+const Lazy = ({ children }: { children: ReactNode }) => <Suspense fallback={<RouteFallback />}>{children}</Suspense>;
 
 export const App = () => {
   const status = useFinanceStore((s) => s.status);
@@ -38,9 +51,10 @@ export const App = () => {
           <Route index element={<DashboardPage />} />
           <Route path="monthly" element={<MonthlyRedirect />} />
           <Route path="monthly/:month" element={<MonthlyPage />} />
-          <Route path="debts" element={<ComingSoon title="Debt tracker" phase={3} description="Multiple debt accounts, payment history and a payoff simulator." />} />
-          <Route path="goals" element={<ComingSoon title="Yearly goals" phase={3} description="8 yearly goal cards with progress and your “This year, I will…” commitment." />} />
-          <Route path="summary" element={<ComingSoon title="Summary of the year" phase={3} description="12-month matrix, category breakdown and charts." />} />
+          <Route path="debts" element={<Lazy><DebtsPage /></Lazy>} />
+          <Route path="debts/:debtId" element={<Lazy><DebtDetailPage /></Lazy>} />
+          <Route path="goals" element={<YearlyGoalsPage />} />
+          <Route path="summary" element={<Lazy><YearSummaryPage /></Lazy>} />
           <Route path="accounts" element={<BankAccountsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="more" element={<MorePage />} />

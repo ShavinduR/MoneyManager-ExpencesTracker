@@ -29,6 +29,8 @@ type FinanceState = {
   addFromDraft: (draft: QuickEntryDraft) => MonthlyEntry;
   updateProfile: (patch: Partial<Profile>) => void;
   setDebts: (updater: (debts: DebtAccount[]) => DebtAccount[]) => void;
+  /** Deletes the account and unlinks (but keeps) its payments in the monthly tables. */
+  deleteDebt: (id: string) => void;
   setBankAccounts: (updater: (accounts: BankAccount[]) => BankAccount[]) => void;
   updateYearPlan: (year: number, updater: (plan: YearPlan) => YearPlan) => void;
   replaceAll: (data: FinanceData) => Promise<void>;
@@ -107,6 +109,18 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     const debts = updater(data.debts);
     set({ data: { ...data, debts }, hasData: true });
     persist(repository.saveDebts(debts));
+  },
+
+  deleteDebt: (id) => {
+    const { data } = get();
+    const affected = Object.values(data.months).filter((m) => m.entries.some((e) => e.kind === 'debt' && e.debtId === id));
+    for (const record of affected) {
+      get().updateMonth(record.month, (r) => ({
+        ...r,
+        entries: r.entries.map((e) => (e.kind === 'debt' && e.debtId === id ? { ...e, debtId: null } : e)),
+      }));
+    }
+    get().setDebts((debts) => debts.filter((d) => d.id !== id));
   },
 
   setBankAccounts: (updater) => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cents, formatMoney, fromMajor, parseMoney, parseSignedMoney, sumCents } from './money';
+import { cents, formatAxis, formatMoney, fromMajor, parseMoney, parseSignedMoney, sumCents } from './money';
 
 describe('money', () => {
   it('avoids floating point drift by summing integer cents', () => {
@@ -31,5 +31,18 @@ describe('money', () => {
     expect(parseSignedMoney('−1.5k')).toBe(fromMajor(-1500));
     expect(parseSignedMoney('250')).toBe(fromMajor(250));
     expect(parseSignedMoney('-')).toBe(null);
+  });
+
+  it.each([
+    [0, '0'],
+    [fromMajor(850), '850'],
+    [fromMajor(50000), '50k'],
+    [fromMajor(1500), '1.5k'],
+    [fromMajor(1_200_000), '1.2M'],
+    [fromMajor(1_250_000), '1.25M'],
+    [fromMajor(-65000), '−65k'],
+    [fromMajor(2_000_000_000), '2B'],
+  ])('formatAxis(%s) → %s', (value, expected) => {
+    expect(formatAxis(value)).toBe(expected);
   });
 });

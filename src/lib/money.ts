@@ -108,3 +108,18 @@ export const toInputString = (value: Cents): string => {
   const major = value / 100;
   return value % 100 === 0 ? String(major) : major.toFixed(2);
 };
+
+/**
+ * Compact axis label for charts: 50000 → "50k", 1_250_000 → "1.25M". No currency prefix, so labels stay
+ * narrow on 390px screens (the currency is shown in the chart title/tooltip instead).
+ */
+export const formatAxis = (value: number): string => {
+  const major = value / 100;
+  const abs = Math.abs(major);
+  const sign = major < 0 ? '−' : '';
+  const trim = (n: number): string => String(Number(n.toFixed(n < 10 ? 2 : 1)));
+  if (abs >= 1_000_000_000) return `${sign}${trim(abs / 1_000_000_000)}B`;
+  if (abs >= 1_000_000) return `${sign}${trim(abs / 1_000_000)}M`;
+  if (abs >= 1_000) return `${sign}${trim(abs / 1_000)}k`;
+  return `${sign}${trim(abs)}`;
+};
