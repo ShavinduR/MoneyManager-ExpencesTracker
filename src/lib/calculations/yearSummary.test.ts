@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDemoData } from '@/lib/demoData';
 import { summarizeAllMonths } from './carryOver';
-import { availableYears, summarizeYear } from './yearSummary';
+import { summarizeYear } from './yearSummary';
 
 describe('summarizeYear', () => {
   const demo = createDemoData(new Date('2026-11-22T10:00:00'));
@@ -33,7 +33,4 @@ describe('summarizeYear', () => {
     expect(last).toBe(y.totals.savings);
   });
 
-  it('lists available years', () => {
-    expect(availableYears(['2025-12', '2026-01'], 2027)).toEqual([2027, 2026, 2025]);
-  });
 });

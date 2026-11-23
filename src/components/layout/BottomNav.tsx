@@ -6,7 +6,7 @@ import { NAV_ITEMS } from './navItems';
 const itemClass = (isActive: boolean): string =>
   cn(
     'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10.5px] font-medium transition-colors duration-150',
-    isActive ? 'text-zinc-900 dark:text-accent-400' : 'text-zinc-500 dark:text-zinc-500',
+    isActive ? 'text-zinc-900 dark:text-accent-400' : 'text-muted dark:text-subtle',
   );
 
 export const BottomNav = () => {

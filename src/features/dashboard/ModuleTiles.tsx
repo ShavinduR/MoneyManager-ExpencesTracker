@@ -13,7 +13,7 @@ import { useFinanceStore } from '@/store/useFinanceStore';
 const Tile = ({ to, icon, label, children }: { to: string; icon: ReactNode; label: string; children: ReactNode }) => (
   <Link to={to} className="group block">
     <Card className="h-full p-4 transition-[border-color,box-shadow] duration-150 group-hover:border-zinc-300 group-hover:shadow-sm dark:group-hover:border-ink-700">
-      <p className="flex items-center gap-1.5 text-xs font-medium text-zinc-500">
+      <p className="flex items-center gap-1.5 text-xs font-medium text-muted">
         {icon}
         {label}
         <ChevronRight className="ml-auto size-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
@@ -38,33 +38,33 @@ export const ModuleTiles = () => {
   const net = accountTotals(accounts).net;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-3 [&>*]:min-w-0">
       <Tile to="/debts" icon={<CreditCard className="size-3.5 text-violet-500" />} label="Debt remaining">
         {active.length ? (
           <>
-            <Money value={remaining} className="text-lg font-semibold tracking-tight" />
+            <Money value={remaining} fit="lg" className="font-semibold tracking-tight" />
             <ProgressBar value={starting > 0 ? (starting - remaining) / starting : 0} className="mt-2" />
-            <p className="mt-1 text-[11px] text-zinc-500">{active.length} active debt{active.length > 1 ? 's' : ''}</p>
+            <p className="mt-1 text-[11px] text-muted">{active.length} active debt{active.length > 1 ? 's' : ''}</p>
           </>
         ) : (
-          <p className="text-sm text-zinc-500">No debts tracked</p>
+          <p className="text-sm text-muted">No debts tracked</p>
         )}
       </Tile>
       <Tile to="/goals" icon={<Target className="size-3.5 text-accent-500" />} label={`${new Date().getFullYear()} goals`}>
         <p className="text-lg font-semibold tracking-tight tabular">
-          {stats.achieved}<span className="text-sm font-normal text-zinc-500"> / {stats.set || 8} achieved</span>
+          {stats.achieved}<span className="text-sm font-normal text-muted"> / {stats.set || 8} achieved</span>
         </p>
         <ProgressBar value={stats.set ? stats.achieved / stats.set : 0} className="mt-2" />
-        <p className="mt-1 text-[11px] text-zinc-500">{stats.inProgress} in progress</p>
+        <p className="mt-1 text-[11px] text-muted">{stats.inProgress} in progress</p>
       </Tile>
       <Tile to="/accounts" icon={<Landmark className="size-3.5 text-sky-500" />} label="Bank net position">
         {accounts.length ? (
           <>
-            <Money value={net} tone="auto" signed={net < 0} className="text-lg font-semibold tracking-tight" />
-            <p className="mt-2.5 text-[11px] text-zinc-500">{accounts.length} account{accounts.length > 1 ? 's' : ''}</p>
+            <Money value={net} tone="auto" signed={net < 0} fit="lg" className="font-semibold tracking-tight" />
+            <p className="mt-2.5 text-[11px] text-muted">{accounts.length} account{accounts.length > 1 ? 's' : ''}</p>
           </>
         ) : (
-          <p className="text-sm text-zinc-500">Add your accounts</p>
+          <p className="text-sm text-muted">Add your accounts</p>
         )}
       </Tile>
     </div>

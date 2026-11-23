@@ -45,7 +45,7 @@ export const OpeningBalanceCard = ({ month, summary, previousMonth }: Props) => 
   return (
     <div className="flex flex-col justify-between gap-2 rounded-[var(--radius-card)] border border-zinc-200/80 bg-white p-4 sm:p-5 dark:border-ink-800 dark:bg-ink-900">
       <div className="flex items-center justify-between gap-2">
-        <p className="flex items-center gap-1.5 text-xs font-medium text-zinc-500">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-muted">
           <ArrowRightLeft className="size-3.5" /> Starting balance
         </p>
         {!editing && (
@@ -56,7 +56,7 @@ export const OpeningBalanceCard = ({ month, summary, previousMonth }: Props) => 
       </div>
       {editing ? (
         <form onSubmit={submit} className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => setNegative((n) => !n)} className="h-9 rounded-lg px-2 text-sm font-semibold text-zinc-500 ring-1 ring-zinc-200 dark:ring-ink-700" aria-label="Toggle negative">
+          <button type="button" onClick={() => setNegative((n) => !n)} className="h-9 rounded-lg px-2 text-sm font-semibold text-muted ring-1 ring-zinc-200 dark:ring-ink-700" aria-label="Toggle negative">
             {negative ? '−' : '+'}
           </button>
           <Input autoFocus value={value} onChange={(e) => setValue(e.target.value)} inputMode="decimal" className="h-9 w-32 flex-1 tabular" aria-label="Starting balance" />
@@ -64,12 +64,12 @@ export const OpeningBalanceCard = ({ month, summary, previousMonth }: Props) => 
           <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
         </form>
       ) : (
-        <Money value={summary.openingBalance} className="text-2xl font-semibold tracking-tight" />
+        <Money value={summary.openingBalance} fit="2xl" className="font-semibold tracking-tight" />
       )}
       <div className="flex items-center gap-2">
         <Badge tone={summary.openingSource === 'override' ? 'amber' : 'neutral'}>{SOURCE_TEXT(summary, previousMonth ?? shiftMonth(month, -1))}</Badge>
         {summary.openingSource === 'override' && (
-          <button type="button" onClick={() => updateMonth(month, (r) => ({ ...r, openingBalanceOverride: null }))} className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-600 hover:underline dark:text-accent-400">
+          <button type="button" onClick={() => updateMonth(month, (r) => ({ ...r, openingBalanceOverride: null }))} className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-700 hover:underline dark:text-accent-400">
             <RotateCcw className="size-3" /> Use carry-over
           </button>
         )}

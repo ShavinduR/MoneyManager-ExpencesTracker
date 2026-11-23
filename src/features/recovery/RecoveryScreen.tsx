@@ -3,6 +3,7 @@ import { Download, LifeBuoy, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { downloadJson } from '@/data/backup';
+import { toISODate } from '@/lib/dates';
 
 /**
  * Shown when stored data exists but can't be read (e.g. it was written by a newer app version).
@@ -18,7 +19,7 @@ export const RecoveryScreen = () => {
 
   const download = async (): Promise<void> => {
     try {
-      downloadJson(await exportRawData(), `mindset-planner-raw-recovery-${new Date().toISOString().slice(0, 10)}.json`);
+      downloadJson(await exportRawData(), `mindset-planner-raw-recovery-${toISODate(new Date())}.json`);
       setDownloaded(true);
     } catch {
       setError('Couldn’t read storage to export it. Try another browser profile or contact support.');

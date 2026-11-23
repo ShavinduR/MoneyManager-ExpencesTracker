@@ -4,6 +4,7 @@ import { getSidebarCollapsed, setSidebarCollapsed } from '@/lib/localPrefs';
 import { QuickEntryBar } from '@/components/quick-entry/QuickEntryBar';
 import { Toaster } from '@/components/ui/toast';
 import { StorageNotices } from './StorageNotices';
+import { UpdateNotice } from './UpdateNotice';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { ThemeToggle } from './ThemeToggle';
@@ -50,6 +51,7 @@ export const AppShell = () => {
       </div>
       <BottomNav />
       <Toaster />
+      <UpdateNotice />
     </div>
   );
 };
@@ -58,7 +60,7 @@ export const PageHeader = ({ title, subtitle, actions }: { title: string; subtit
   <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
     <div className="min-w-0">
       <h1 className="text-2xl font-semibold tracking-tight text-balance">{title}</h1>
-      {subtitle && <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{subtitle}</p>}
+      {subtitle && <p className="mt-1 text-sm text-muted dark:text-zinc-400">{subtitle}</p>}
     </div>
     {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
   </div>

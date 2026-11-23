@@ -111,7 +111,7 @@ export const BillFormModal = ({ open, onClose, month, bill, onSave }: BillFormMo
         <label className="col-span-2 flex cursor-pointer items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 text-sm dark:bg-ink-850">
           <CheckCircle checked={form.paid} onChange={togglePaid} label="Paid" />
           <span>Paid</span>
-          <span className="ml-auto text-xs text-zinc-500">Only the amount paid counts toward expenses</span>
+          <span className="ml-auto text-xs text-muted">Only the amount paid counts toward expenses</span>
         </label>
         {error && <p className="col-span-2 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
         <button type="submit" className="hidden" aria-hidden tabIndex={-1} />

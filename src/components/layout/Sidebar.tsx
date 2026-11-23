@@ -18,7 +18,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => (
       {!collapsed && (
         <div className="hidden leading-tight lg:block">
           <p className="text-sm font-semibold tracking-tight">Mindset</p>
-          <p className="text-[11px] text-zinc-500">Finance Planner</p>
+          <p className="text-[11px] text-muted">Finance Planner</p>
         </div>
       )}
     </div>
@@ -49,7 +49,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => (
         type="button"
         onClick={onToggle}
         className={cn(
-          'flex h-9 w-full items-center gap-3 rounded-xl px-3 text-xs text-zinc-500 transition-[background-color,color] hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-ink-850 dark:hover:text-zinc-200',
+          'flex h-9 w-full items-center gap-3 rounded-xl px-3 text-xs text-muted transition-[background-color,color] hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-ink-850 dark:hover:text-zinc-200',
           collapsed && 'justify-center px-0',
         )}
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}

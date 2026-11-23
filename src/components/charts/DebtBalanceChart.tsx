@@ -3,7 +3,7 @@ import type { PayoffResult } from '@/lib/calculations/payoffSimulator';
 import { formatAxis } from '@/lib/money';
 import { formatMonthLong, MONTH_LABELS_SHORT, parseMonthKey } from '@/lib/dates';
 import { useCurrency } from '@/store/selectors';
-import { AXIS_TICK, SERIES, useChartTheme, Y_AXIS_WIDTH } from './chartTheme';
+import { AXIS_TICK, legendFormatter, SERIES, useChartTheme, Y_AXIS_WIDTH } from './chartTheme';
 import { ChartTooltip } from './ChartTooltip';
 
 const shortMonth = (key: string): string => {
@@ -41,7 +41,7 @@ export const DebtBalanceChart = ({ baseline, accelerated }: Props) => {
         <XAxis dataKey="month" tickFormatter={shortMonth} tick={{ ...AXIS_TICK, fill: theme.axis }} axisLine={false} tickLine={false} minTickGap={28} />
         <YAxis tickFormatter={formatAxis} tick={{ ...AXIS_TICK, fill: theme.axis }} axisLine={false} tickLine={false} width={Y_AXIS_WIDTH} />
         <Tooltip content={(p) => <ChartTooltip active={p.active} payload={p.payload} label={p.label} currency={currency} labelFormatter={formatMonthLong} />} />
-        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} formatter={legendFormatter(theme.legend)} />
         {base.length > 0 && <Area type="monotone" dataKey="minimum" name="Minimum only" stroke={SERIES.baseline} strokeDasharray="4 4" strokeWidth={2} fill="none" />}
         {fast.length > 0 && <Area type="monotone" dataKey="extra" name="With extra" stroke={SERIES.accelerated} strokeWidth={2} fill="url(#extraFill)" />}
       </AreaChart>

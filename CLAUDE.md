@@ -41,6 +41,10 @@ npm run typecheck    # tsc only
 ## UI conventions
 
 - Tailwind only, `class`-based dark mode. Design tokens (colors, radius) live in `src/styles/index.css` `@theme`.
+- Secondary text uses `text-muted` / `text-subtle` (AA in both themes). Don't use `text-zinc-400/500` for text, or 600-level green/accent/sky/amber text on light backgrounds; use the 700 shades.
+- Dialogs use `components/ui/Modal` (native `<dialog>` + `showModal()`); don't build ad-hoc overlays. Destructive actions use `ConfirmDialog`, never `window.confirm`.
+- Big amounts in cards use `<Money fit="xl|2xl|…">` so long values step down instead of overflowing; grids of cards need `[&>*]:min-w-0`.
+- No inline scripts (the CSP forbids them); put boot code in `public/`.
 - Mobile-first: bottom nav <768px, collapsible sidebar ≥768px. Tables become card lists on mobile.
 - Numbers use `tabular-nums`. Positive and negative amounts get semantic color plus a sign, never color alone.
 - Every list has an empty state with a clear next action.

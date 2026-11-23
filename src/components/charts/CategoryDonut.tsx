@@ -33,7 +33,7 @@ export const CategoryDonut = ({ rows }: { rows: CategoryRow[] }) => {
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-[11px] text-zinc-500">Total</span>
+          <span className="text-[11px] text-muted">Total</span>
           <span className="text-lg font-semibold tracking-tight tabular">{formatAxis(total)}</span>
         </div>
       </div>
@@ -45,7 +45,7 @@ export const CategoryDonut = ({ rows }: { rows: CategoryRow[] }) => {
               <span className="truncate">{d.name}</span>
             </span>
             <span className="flex shrink-0 items-center gap-2">
-              <span className="text-xs text-zinc-500 tabular">{total > 0 ? Math.round((d.value / total) * 100) : 0}%</span>
+              <span className="text-xs text-muted tabular">{total > 0 ? Math.round((d.value / total) * 100) : 0}%</span>
               <Money value={d.value} compact className="w-16 text-right text-xs font-medium" />
             </span>
           </li>

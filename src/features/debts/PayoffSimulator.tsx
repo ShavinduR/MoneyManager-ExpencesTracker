@@ -24,16 +24,16 @@ const durationLabel = (months: number): string => {
 
 const ResultTile = ({ title, result, highlight }: { title: string; result: PayoffResult; highlight?: boolean }) => (
   <div className={cn('rounded-2xl p-4', highlight ? 'bg-emerald-50 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:ring-emerald-500/20' : 'bg-zinc-50 dark:bg-ink-850')}>
-    <p className="text-xs font-medium text-zinc-500">{title}</p>
+    <p className="text-xs font-medium text-muted">{title}</p>
     {result.kind === 'paid-off' ? (
       <>
         <p className="mt-1 text-lg font-semibold tracking-tight">{formatMonthLong(result.payoffMonth)}</p>
-        <p className="text-xs text-zinc-500">{durationLabel(result.months)} · interest <Money value={result.totalInterest} /></p>
+        <p className="text-xs text-muted">{durationLabel(result.months)} · interest <Money value={result.totalInterest} /></p>
       </>
     ) : result.kind === 'never' ? (
       <>
         <p className="mt-1 text-lg font-semibold tracking-tight text-red-600 dark:text-red-400">Never</p>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-muted">
           {result.reason === 'too-long' ? 'Takes over 50 years' : result.reason === 'invalid-input' ? 'Check the rate and amounts' : 'Payment doesn’t cover interest'}
         </p>
       </>
@@ -91,7 +91,7 @@ export const PayoffSimulator = ({ debt, remaining }: Props) => {
           <div className="flex items-end justify-between gap-3">
             <label htmlFor={`extra-${debt.id}`} className="text-sm font-medium">Extra per month</label>
             <div className="flex items-center gap-1 rounded-xl border border-zinc-200 px-2.5 py-1 dark:border-ink-700">
-              <span className="text-xs text-zinc-500">+</span>
+              <span className="text-xs text-muted">+</span>
               <input
                 aria-label="Extra monthly payment amount"
                 value={extraMajor}
@@ -114,7 +114,7 @@ export const PayoffSimulator = ({ debt, remaining }: Props) => {
             onChange={(e) => setExtraMajor(Number(e.target.value))}
             className="mt-3 w-full accent-emerald-500"
           />
-          <div className="mt-1 flex justify-between text-[11px] text-zinc-500 tabular">
+          <div className="mt-1 flex justify-between text-[11px] text-muted tabular">
             <span>Min only</span>
             <span>
               Paying <Money value={cents(debt.minimumPayment + extra)} className="font-medium text-zinc-700 dark:text-zinc-300" /> / month
@@ -131,19 +131,19 @@ export const PayoffSimulator = ({ debt, remaining }: Props) => {
           <div className="flex items-start gap-2">
             <PiggyBank className="mt-0.5 size-4 text-emerald-500" />
             <div>
-              <p className="text-xs text-zinc-500">Interest saved</p>
+              <p className="text-xs text-muted">Interest saved</p>
               {comparison.interestSaved !== null ? (
                 <Money value={comparison.interestSaved} className="font-semibold" />
               ) : (
                 <span className="font-semibold">{comparison.baseline.kind === 'never' && accelerated.kind === 'paid-off' ? 'Escapes the debt trap' : '—'}</span>
               )}
-              {interestFree && <p className="text-[11px] text-zinc-500">Interest-free: extra only shortens the term</p>}
+              {interestFree && <p className="text-[11px] text-muted">Interest-free: extra only shortens the term</p>}
             </div>
           </div>
           <div className="flex items-start gap-2">
             <Timer className="mt-0.5 size-4 text-sky-500" />
             <div>
-              <p className="text-xs text-zinc-500">Time saved</p>
+              <p className="text-xs text-muted">Time saved</p>
               <span className="font-semibold">{comparison.monthsSaved !== null ? durationLabel(comparison.monthsSaved) : '—'}</span>
             </div>
           </div>
@@ -151,15 +151,15 @@ export const PayoffSimulator = ({ debt, remaining }: Props) => {
             <div className="col-span-2 flex items-start gap-2 sm:col-span-1">
               {onTrack ? <CalendarCheck2 className="mt-0.5 size-4 text-emerald-500" /> : <Target className="mt-0.5 size-4 text-amber-500" />}
               <div>
-                <p className="text-xs text-zinc-500">Goal: {formatMonthLong(goalMonth)}</p>
+                <p className="text-xs text-muted">Goal: {formatMonthLong(goalMonth)}</p>
                 {onTrack ? (
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">On track ✓</span>
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-400">On track ✓</span>
                 ) : neededForGoal !== null ? (
                   <span className="font-semibold">
                     Pay <Money value={cents(Math.ceil(neededForGoal / 100) * 100)} />/mo
                   </span>
                 ) : (
-                  <span className="font-semibold text-zinc-500">Goal date has passed</span>
+                  <span className="font-semibold text-muted">Goal date has passed</span>
                 )}
               </div>
             </div>

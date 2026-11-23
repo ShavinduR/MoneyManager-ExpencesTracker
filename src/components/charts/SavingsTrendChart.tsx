@@ -2,7 +2,7 @@ import { Area, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, 
 import type { YearSummary } from '@/lib/calculations/yearSummary';
 import { formatAxis } from '@/lib/money';
 import { useCurrency } from '@/store/selectors';
-import { AXIS_TICK, SERIES, useChartTheme, Y_AXIS_WIDTH } from './chartTheme';
+import { AXIS_TICK, legendFormatter, SERIES, useChartTheme, Y_AXIS_WIDTH } from './chartTheme';
 import { ChartTooltip } from './ChartTooltip';
 
 /** Monthly savings (line) over cumulative savings (area). Empty months break the line instead of dropping to 0. */
@@ -28,7 +28,7 @@ export const SavingsTrendChart = ({ summary }: { summary: YearSummary }) => {
         <XAxis dataKey="label" tick={{ ...AXIS_TICK, fill: theme.axis }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={4} />
         <YAxis tickFormatter={formatAxis} tick={{ ...AXIS_TICK, fill: theme.axis }} axisLine={false} tickLine={false} width={Y_AXIS_WIDTH} />
         <Tooltip content={(p) => <ChartTooltip active={p.active} payload={p.payload} label={p.label} currency={currency} />} />
-        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} formatter={legendFormatter(theme.legend)} />
         <Area type="monotone" dataKey="cumulative" name="Saved so far" stroke={SERIES.savings} strokeWidth={2} fill="url(#savingsFill)" connectNulls />
         <Line type="monotone" dataKey="monthly" name="Saved this month" stroke={SERIES.income} strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
       </ComposedChart>

@@ -12,7 +12,7 @@ import { Field, Input, Select } from '@/components/ui/Field';
 import { Segmented } from '@/components/ui/Segmented';
 import { toast } from '@/components/ui/toast';
 import { formatMoney, fromMajor, parseSignedMoney, toInputString } from '@/lib/money';
-import { getGeminiKey, setGeminiKey } from '@/lib/localPrefs';
+import { DEFAULT_GEMINI_MODEL, getGeminiKey, getGeminiModel, isValidModelId, setGeminiKey, setGeminiModel } from '@/lib/localPrefs';
 import { formatBytes, getStorageInfo, requestPersistentStorage, type StorageInfo } from '@/lib/deviceStorage';
 import { backupStats, downloadBackup, readBackupFile, type BackupStats } from '@/data/backup';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -36,7 +36,7 @@ const StatsGrid = ({ stats }: { stats: BackupStats }) => (
     ).map(([label, value]) => (
       <div key={label} className="rounded-xl bg-zinc-50 px-2 py-2.5 dark:bg-ink-850">
         <dd className="text-lg font-semibold tabular">{value}</dd>
-        <dt className="text-[11px] text-zinc-500">{label}</dt>
+        <dt className="text-[11px] text-muted">{label}</dt>
       </div>
     ))}
   </dl>
@@ -116,6 +116,7 @@ const AiCard = () => {
   const llmEnabled = useFinanceStore((s) => s.data.profile.llmEnabled);
   const updateProfile = useFinanceStore((s) => s.updateProfile);
   const [apiKey, setApiKey] = useState(getGeminiKey() ?? '');
+  const [model, setModel] = useState(getGeminiModel());
   return (
     <Card>
       <CardHeader title="AI quick-entry (optional)" subtitle="The offline parser always works; Gemini is an extra for free-form text" icon={<KeyRound className="size-4" />} />
@@ -129,6 +130,24 @@ const AiCard = () => {
             <div className="flex gap-2">
               <Input id={id} type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="AIza…" autoComplete="off" />
               <Button onClick={() => { setGeminiKey(apiKey); toast.success(apiKey.trim() ? 'Key saved on this device' : 'Key removed'); }}>Save</Button>
+            </div>
+          )}
+        </Field>
+        <Field label="Gemini model" hint={`Default ${DEFAULT_GEMINI_MODEL}. Change it if Google retires that model.`}>
+          {(id) => (
+            <div className="flex gap-2">
+              <Input id={id} value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_GEMINI_MODEL} autoComplete="off" spellCheck={false} />
+              <Button
+                onClick={() => {
+                  const next = model.trim() || DEFAULT_GEMINI_MODEL;
+                  if (!isValidModelId(next)) return toast.error('Model ids look like “gemini-2.5-flash”.');
+                  setGeminiModel(next);
+                  setModel(next);
+                  toast.success(`Using ${next}`);
+                }}
+              >
+                Save
+              </Button>
             </div>
           )}
         </Field>
@@ -176,7 +195,7 @@ const DataCard = () => {
           <Button icon={<Database className="size-4" />} onClick={() => setPending({ kind: 'demo' })}>Load sample data</Button>
           <Button variant="danger" icon={<RotateCcw className="size-4" />} onClick={() => setPending({ kind: 'reset' })} className="sm:ml-auto">Reset data</Button>
         </div>
-        <p className="flex gap-2 text-xs text-zinc-500">
+        <p className="flex gap-2 text-xs text-muted">
           <ShieldCheck className="size-4 shrink-0 text-accent-500" />
           Imports are validated before anything is replaced: unknown fields (like passwords on bank accounts), full card numbers and non-integer amounts are rejected.
         </p>
@@ -198,7 +217,7 @@ const DataCard = () => {
         {pending?.kind === 'import' && (
           <div className="space-y-3 text-sm">
             <StatsGrid stats={backupStats(pending.data)} />
-            <p className="text-xs text-zinc-500">Your current data ({current.months} months, {current.entries} entries) will be replaced. Export a backup first if you might need it.</p>
+            <p className="text-xs text-muted">Your current data ({current.months} months, {current.entries} entries) will be replaced. Export a backup first if you might need it.</p>
           </div>
         )}
       </ConfirmDialog>
@@ -278,7 +297,7 @@ const DeviceCard = () => {
           ) : canInstall ? (
             <Button size="sm" variant="primary" onClick={() => void install()}>Install app</Button>
           ) : (
-            <span className="text-xs text-zinc-500">Use your browser’s “Install” or “Add to Home Screen”</span>
+            <span className="text-xs text-muted">Use your browser’s “Install” or “Add to Home Screen”</span>
           )}
         </div>
       </div>

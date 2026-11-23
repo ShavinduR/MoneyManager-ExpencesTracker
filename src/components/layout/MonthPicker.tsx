@@ -15,7 +15,21 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
   const [viewYear, setViewYear] = useState(year);
   const months = useFinanceStore((s) => s.data.months);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const today = currentMonthKey();
+
+  const close = (returnFocus: boolean): void => {
+    setOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
+  };
+
+  // Move focus into the popover on open: the selected month, else the first month (L6).
+  useEffect(() => {
+    if (!open) return;
+    const target = popoverRef.current?.querySelector<HTMLElement>('[aria-current="date"]') ?? popoverRef.current?.querySelector<HTMLElement>('[data-month]');
+    target?.focus();
+  }, [open]);
 
   useEffect(() => setViewYear(year), [year]);
 
@@ -25,7 +39,10 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
       if (ref.current && e.target instanceof Node && !ref.current.contains(e.target)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);
@@ -41,6 +58,7 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
         <ChevronLeft className="size-4" />
       </IconButton>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -48,14 +66,14 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
         className="flex h-9 min-w-40 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold tracking-tight hover:bg-zinc-100 dark:hover:bg-ink-800"
       >
         {formatMonthLong(value)}
-        <ChevronDown className={cn('size-3.5 text-zinc-400 transition-transform duration-150', open && 'rotate-180')} />
+        <ChevronDown className={cn('size-3.5 text-subtle transition-transform duration-150', open && 'rotate-180')} />
       </button>
       <IconButton label="Next month" onClick={() => onChange(shiftMonth(value, 1))}>
         <ChevronRight className="size-4" />
       </IconButton>
 
       {open && (
-        <div role="dialog" aria-label="Choose month" className="absolute left-1/2 top-full z-40 mt-2 w-72 -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-3 shadow-xl animate-pop-in dark:border-ink-700 dark:bg-ink-850">
+        <div ref={popoverRef} role="dialog" aria-label="Choose month" className="absolute left-1/2 top-full z-40 mt-2 w-72 -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-3 shadow-xl animate-pop-in dark:border-ink-700 dark:bg-ink-850">
           <div className="mb-2 flex items-center justify-between">
             <IconButton label="Previous year" onClick={() => setViewYear((y) => y - 1)}>
               <ChevronLeft className="size-4" />
@@ -74,9 +92,12 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
                 <button
                   key={label}
                   type="button"
+                  data-month={key}
+                  aria-current={selected ? 'date' : undefined}
+                  aria-label={`${label} ${viewYear}${hasData ? ', has entries' : ''}`}
                   onClick={() => {
                     onChange(key);
-                    setOpen(false);
+                    close(true);
                   }}
                   className={cn(
                     'relative h-10 rounded-xl text-xs font-semibold uppercase tracking-wide transition-[background-color,color] duration-150',
@@ -93,7 +114,7 @@ export const MonthPicker = ({ value, onChange }: MonthPickerProps) => {
             })}
           </div>
           {value !== today && (
-            <button type="button" onClick={() => { onChange(today); setOpen(false); }} className="mt-2 w-full rounded-lg py-1.5 text-xs font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">
+            <button type="button" onClick={() => { onChange(today); close(true); }} className="mt-2 w-full rounded-lg py-1.5 text-xs font-medium text-accent-700 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">
               Jump to this month
             </button>
           )}

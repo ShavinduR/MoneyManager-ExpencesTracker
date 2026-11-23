@@ -18,7 +18,7 @@ const DebtDetailPage = lazy(() => import('@/features/debts/DebtDetailPage'));
 const YearSummaryPage = lazy(() => import('@/features/summary/YearSummaryPage'));
 
 const RouteFallback = () => (
-  <div className="flex min-h-[50vh] items-center justify-center text-zinc-400">
+  <div className="flex min-h-[50vh] items-center justify-center text-subtle">
     <Loader2 className="size-5 animate-spin" aria-label="Loading" />
   </div>
 );
@@ -36,7 +36,7 @@ export const App = () => {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-dvh items-center justify-center text-zinc-400">
+      <div className="flex min-h-dvh items-center justify-center text-subtle">
         <Loader2 className="size-5 animate-spin" aria-label="Loading" />
       </div>
     );
@@ -44,7 +44,7 @@ export const App = () => {
   if (status === 'unreadable') return <RecoveryScreen />;
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<DashboardPage />} />

@@ -5,6 +5,7 @@ import type { DebtAccount, DebtEntry } from '@/types/finance';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Button, IconButton } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Money } from '@/components/ui/Money';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -28,6 +29,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
   const [editOpen, setEditOpen] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<DebtEntry | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const findEntry = (entryId: string, month: string): DebtEntry | null => {
     const entry = months[month]?.entries.find((e) => e.id === entryId);
@@ -53,7 +55,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
   return (
     <div className="animate-fade-up space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link to="/debts" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+        <Link to="/debts" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-zinc-900 dark:hover:text-zinc-100">
           <ArrowLeft className="size-4" /> All debts
         </Link>
         <div className="flex gap-1">
@@ -61,16 +63,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
           <IconButton label={debt.archived ? 'Restore debt' : 'Archive debt'} onClick={() => setArchived(!debt.archived)}>
             {debt.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
           </IconButton>
-          <IconButton
-            label="Delete debt"
-            tone="danger"
-            onClick={() => {
-              if (!window.confirm(`Delete ${debt.creditor}? Its payments stay in your monthly tables but will be unlinked.`)) return;
-              deleteDebt(debt.id);
-              navigate('/debts');
-              toast.success(`Deleted ${debt.creditor}`);
-            }}
-          >
+          <IconButton label="Delete debt" tone="danger" onClick={() => setConfirmDelete(true)}>
             <Trash2 className="size-4" />
           </IconButton>
         </div>
@@ -81,7 +74,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">{debt.creditor}</h1>
-              <p className="mt-1 font-mono text-xs text-zinc-500">Account {maskLast4(debt.accountRef)}</p>
+              <p className="mt-1 font-mono text-xs text-muted">Account {maskLast4(debt.accountRef)}</p>
             </div>
             <div className="flex gap-1.5">
               {debt.archived && <Badge>Archived</Badge>}
@@ -100,7 +93,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
                   <>
                     <Money value={progress.totalPaid} tone="positive" />
                     {progress.plannedCount > 0 && (
-                      <span className="ml-1 text-xs font-normal text-zinc-500">
+                      <span className="ml-1 text-xs font-normal text-muted">
                         + <Money value={progress.plannedTotal} />
                       </span>
                     )}
@@ -110,7 +103,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
               { label: 'Goal payoff date', value: debt.goalPayoffDate ? formatMonthLong(monthKeyOf(debt.goalPayoffDate)) : '—' },
             ].map((item) => (
               <div key={item.label}>
-                <dt className="text-xs text-zinc-500">{item.label}</dt>
+                <dt className="text-xs text-muted">{item.label}</dt>
                 <dd className="mt-0.5 font-semibold">{item.value}</dd>
               </div>
             ))}
@@ -118,17 +111,17 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
           <div className="mt-6">
             <div className="mb-2 flex items-end justify-between">
               <div>
-                <p className="text-xs text-zinc-500">Remaining balance</p>
-                <Money value={progress.remaining} className="text-3xl font-semibold tracking-tight" />
+                <p className="text-xs text-muted">Remaining balance</p>
+                <Money value={progress.remaining} fit="3xl" className="block font-semibold tracking-tight" />
               </div>
-              <span className="text-sm font-semibold tabular text-emerald-600 dark:text-emerald-400">{Math.round(progress.progress * 100)}%</span>
+              <span className="text-sm font-semibold tabular text-emerald-700 dark:text-emerald-400">{Math.round(progress.progress * 100)}%</span>
             </div>
             <ProgressBar value={progress.progress} className="h-2" />
           </div>
         </div>
         {debt.motivation && (
           <div className="flex gap-3 border-t border-zinc-100 bg-gradient-to-r from-accent-50 to-transparent px-5 py-4 sm:px-6 dark:border-ink-800 dark:from-accent-500/10">
-            <Quote className="mt-0.5 size-4 shrink-0 text-accent-600 dark:text-accent-400" />
+            <Quote className="mt-0.5 size-4 shrink-0 text-accent-700 dark:text-accent-400" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-400">Why I’m doing this…</p>
               <p className="mt-1 text-sm leading-relaxed text-pretty">{debt.motivation}</p>
@@ -154,7 +147,7 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
             <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-y border-zinc-100 text-left text-[11px] uppercase tracking-wider text-zinc-400 dark:border-ink-800">
+                <tr className="border-y border-zinc-100 text-left text-[11px] uppercase tracking-wider text-subtle dark:border-ink-800">
                   <th className="py-2 pl-4 font-medium sm:pl-5">Date</th>
                   <th className="py-2 text-right font-medium">Paid</th>
                   <th className="py-2 pr-2 text-right font-medium">Balance</th>
@@ -169,10 +162,10 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
                       <td className="py-2.5 pl-4 sm:pl-5">
                         <Link to={`/monthly/${row.month}`} className="whitespace-nowrap text-xs tabular hover:underline">{formatDateShort(row.date)} ’{row.date.slice(2, 4)}</Link>
                         {!row.cleared && <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400">Planned: not counted yet</p>}
-                        {row.notes && <p className="max-w-32 truncate text-[11px] text-zinc-500">{row.notes}</p>}
+                        {row.notes && <p className="max-w-32 truncate text-[11px] text-muted">{row.notes}</p>}
                       </td>
-                      <td className={row.cleared ? 'py-2.5 text-right font-medium' : 'py-2.5 text-right italic text-zinc-500'}><Money value={row.amountPaid} /></td>
-                      <td className="py-2.5 pr-2 text-right text-zinc-500">{row.cleared ? <Money value={row.remainingBalance} /> : '—'}</td>
+                      <td className={row.cleared ? 'py-2.5 text-right font-medium' : 'py-2.5 text-right italic text-muted'}><Money value={row.amountPaid} /></td>
+                      <td className="py-2.5 pr-2 text-right text-muted">{row.cleared ? <Money value={row.remainingBalance} /> : '—'}</td>
                       <td className="py-2.5 pr-3">
                         {entry && (
                           <div className="flex justify-end opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
@@ -192,6 +185,19 @@ const Detail = ({ debt }: { debt: DebtAccount }) => {
       </div>
 
       <DebtFormModal open={editOpen} onClose={() => setEditOpen(false)} debt={debt} onSave={(next) => setDebts((list) => list.map((d) => (d.id === next.id ? next : d)))} />
+      <ConfirmDialog
+        open={confirmDelete}
+        title={`Delete ${debt.creditor}?`}
+        description="Its payments stay in your monthly tables, unlinked from this debt."
+        confirmLabel="Delete debt"
+        tone="danger"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          deleteDebt(debt.id);
+          navigate('/debts');
+          toast.success(`Deleted ${debt.creditor}`);
+        }}
+      />
       <PaymentModal open={paymentOpen} onClose={() => setPaymentOpen(false)} debt={debt} payment={editingPayment} onSave={savePayment} />
     </div>
   );

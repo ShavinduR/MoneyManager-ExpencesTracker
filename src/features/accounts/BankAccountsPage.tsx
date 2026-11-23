@@ -26,7 +26,7 @@ const AccountCard = ({ account, onEdit, onDelete }: { account: BankAccount; onEd
           </span>
           <div className="min-w-0">
             <p className="truncate font-semibold tracking-tight">{account.name}</p>
-            <p className="truncate text-xs text-zinc-500">{account.institution || 'No institution'}{account.branch ? ` · ${account.branch}` : ''}</p>
+            <p className="truncate text-xs text-muted">{account.institution || 'No institution'}{account.branch ? ` · ${account.branch}` : ''}</p>
           </div>
         </div>
         <div className="flex opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
@@ -36,15 +36,15 @@ const AccountCard = ({ account, onEdit, onDelete }: { account: BankAccount; onEd
       </div>
       <div className="mt-5 flex items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Current balance</p>
-          <Money value={account.currentBalance} signed={account.currentBalance < 0} tone={account.currentBalance < 0 ? 'negative' : 'none'} className="text-xl font-semibold tracking-tight" />
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Current balance</p>
+          <Money value={account.currentBalance} signed={account.currentBalance < 0} tone={account.currentBalance < 0 ? 'negative' : 'none'} fit="xl" className="font-semibold tracking-tight" />
         </div>
         <div className="flex flex-col items-end gap-1.5">
           <Badge>{ACCOUNT_TYPE_LABELS[account.type]}</Badge>
-          <span className="font-mono text-xs text-zinc-500 tabular">{maskLast4(account.cardLast4)}</span>
+          <span className="font-mono text-xs text-muted tabular">{maskLast4(account.cardLast4)}</span>
         </div>
       </div>
-      {account.notes && <p className="mt-3 border-t border-zinc-100 pt-3 text-xs text-zinc-500 dark:border-ink-800">{account.notes}</p>}
+      {account.notes && <p className="mt-3 border-t border-zinc-100 pt-3 text-xs text-muted dark:border-ink-800">{account.notes}</p>}
     </Card>
   );
 };
@@ -84,15 +84,15 @@ export const BankAccountsPage = () => {
       />
 
       {accounts.length > 0 && (
-        <div className="mb-4 grid grid-cols-3 gap-3">
+        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3 [&>*]:min-w-0">
           {[
             { label: 'Assets', value: totals.assets, tone: 'none' as const },
             { label: 'Owed', value: totals.liabilities, tone: totals.liabilities < 0 ? ('negative' as const) : ('muted' as const) },
             { label: 'Net position', value: totals.net, tone: 'auto' as const },
           ].map((s) => (
-            <Card key={s.label} className="p-4">
-              <p className="text-xs font-medium text-zinc-500">{s.label}</p>
-              <Money value={s.value} tone={s.tone} signed={s.value < 0} className="mt-1 block text-base font-semibold tracking-tight sm:text-xl" />
+            <Card key={s.label} className="flex items-baseline justify-between gap-3 px-4 py-3 sm:block sm:p-4">
+              <p className="text-xs font-medium text-muted">{s.label}</p>
+              <Money value={s.value} tone={s.tone} signed={s.value < 0} fit="xl" className="font-semibold tracking-tight sm:mt-1 sm:block" />
             </Card>
           ))}
         </div>
@@ -108,7 +108,7 @@ export const BankAccountsPage = () => {
           />
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
           {accounts.map((account) => (
             <AccountCard key={account.id} account={account} onEdit={() => { setEditing(account); setOpen(true); }} onDelete={() => remove(account)} />
           ))}

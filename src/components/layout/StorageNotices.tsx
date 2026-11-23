@@ -2,6 +2,7 @@ import { AlertTriangle, Download, HardDrive, Info, RotateCw, X } from 'lucide-re
 import type { ReactNode } from 'react';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { downloadBackup, downloadJson } from '@/data/backup';
+import { toISODate } from '@/lib/dates';
 import { cn } from '@/lib/cn';
 
 const Notice = ({ tone, icon, children, actions }: { tone: 'amber' | 'red' | 'blue'; icon: ReactNode; children: ReactNode; actions?: ReactNode }) => (
@@ -59,7 +60,7 @@ export const StorageNotices = () => {
           icon={<AlertTriangle className="size-4" />}
           actions={
             <>
-              <button type="button" className={actionClass} onClick={() => void exportRawData().then((raw) => downloadJson(raw, `mindset-planner-raw-recovery-${new Date().toISOString().slice(0, 10)}.json`))}>
+              <button type="button" className={actionClass} onClick={() => void exportRawData().then((raw) => downloadJson(raw, `mindset-planner-raw-recovery-${toISODate(new Date())}.json`))}>
                 <Download className="size-3.5" /> Download raw copy
               </button>
               <button type="button" className={actionClass} onClick={dismissLoadIssues} aria-label="Dismiss">

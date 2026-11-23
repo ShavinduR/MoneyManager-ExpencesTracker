@@ -66,7 +66,7 @@ export const PaymentModal = ({ open, onClose, debt, payment, onSave }: Props) =>
         <label className="col-span-2 flex cursor-pointer items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 text-sm dark:bg-ink-850">
           <CheckCircle checked={cleared} onChange={() => setCleared((c) => !c)} label="Paid" />
           <span>Paid</span>
-          <span className="ml-auto text-xs text-zinc-500">Planned payments don’t reduce the balance until paid</span>
+          <span className="ml-auto text-xs text-muted">Planned payments don’t reduce the balance until paid</span>
         </label>
         {error && <p className="col-span-2 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
         <button type="submit" className="hidden" aria-hidden tabIndex={-1} />

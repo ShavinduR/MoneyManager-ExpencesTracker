@@ -22,7 +22,7 @@ export const CheckCircle = ({ checked, onChange, label, className }: CheckCircle
       'before:absolute before:-inset-2.5 before:content-[""]',
       checked
         ? 'border-accent-500 bg-accent-500 text-white dark:text-ink-950'
-        : 'border-zinc-300 hover:border-accent-500 dark:border-zinc-600',
+        : 'border-zinc-500 hover:border-accent-600 dark:border-zinc-500 dark:hover:border-accent-400',
       className,
     )}
   >

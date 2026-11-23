@@ -1,5 +1,6 @@
 import type { BackupEnvelope, FinanceData } from '@/types/finance';
 import { parseImport } from './schema';
+import { toISODate } from '@/lib/dates';
 
 export const BACKUP_APP_ID = 'mindset-finance-planner';
 
@@ -52,7 +53,8 @@ export const backupStats = (data: FinanceData): BackupStats => ({
   goals: Object.values(data.yearPlans).reduce((n, p) => n + p.goals.filter((g) => g.title.trim()).length, 0),
 });
 
-export const backupFileName = (now: Date = new Date()): string => `mindset-planner-backup-${now.toISOString().slice(0, 10)}.json`;
+/** Uses the LOCAL date (L12): an export at 9 pm in Colombo is named for today, not tomorrow (UTC). */
+export const backupFileName = (now: Date = new Date()): string => `mindset-planner-backup-${toISODate(now)}.json`;
 
 /** Browser-only: triggers a download of the backup file. */
 export const downloadBackup = (data: FinanceData): void => downloadJson(createBackup(data), backupFileName());

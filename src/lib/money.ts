@@ -95,8 +95,6 @@ const LOCALE: Record<CurrencyCode, string> = {
   AUD: 'en-AU',
 };
 
-export const currencySymbol = (currency: CurrencyCode): string => CURRENCY_PREFIX[currency].trim();
-
 export const formatMoney = (value: Cents, currency: CurrencyCode, options: FormatOptions = {}): string => {
   const { decimals = 'auto', signed = false, compact = false } = options;
   const major = Math.abs(value) / 100;

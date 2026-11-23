@@ -6,8 +6,8 @@ import { fromMajor } from '@/lib/money';
 import type { EntryTarget } from './lexicon';
 import type { ParseResult } from './parser';
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const endpointFor = (model: string): string =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
 /** The LLM's reply is untrusted: validate every field before it becomes a draft. */
 const llmReplySchema = z.object({
@@ -52,6 +52,8 @@ export const resolveGeminiKey = (storedKey: string | null): string | null => {
 
 export type LlmParseOptions = {
   apiKey: string;
+  /** e.g. "gemini-2.5-flash"; configurable in Settings because Google retires model versions. */
+  model: string;
   today?: ISODate;
   debts?: readonly Pick<DebtAccount, 'id' | 'creditor' | 'archived'>[];
   signal?: AbortSignal;
@@ -78,7 +80,7 @@ export const parseWithGemini = async (text: string, options: LlmParseOptions): P
 
   let response: Response;
   try {
-    response = await fetch(ENDPOINT, {
+    response = await fetch(endpointFor(options.model), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': options.apiKey },
       body: JSON.stringify({
@@ -89,6 +91,9 @@ export const parseWithGemini = async (text: string, options: LlmParseOptions): P
     });
   } catch {
     return { ok: false, reason: 'AI parse unavailable (offline?). The offline parser still works.' };
+  }
+  if (response.status === 404) {
+    return { ok: false, reason: `Model “${options.model}” wasn’t found. Choose a current Gemini model in Settings.` };
   }
   if (!response.ok) return { ok: false, reason: `AI parse failed (${response.status}). Check your API key in Settings.` };
 
